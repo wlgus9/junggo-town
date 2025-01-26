@@ -21,7 +21,24 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public List<Member> findMember() {
-        return memberRepository.findMember();
+    public boolean login(Member member) {
+        return memberRepository.existsByUserIdAndUserPw(member);
     }
+
+    @Override
+    public List<Member> findMemberById(String userId) {
+        return memberRepository.findMemberById(userId);
+    }
+
+    @Override
+    public void updateMemberByUserIdAndUserPw(String userId, String userPw, String originId) {
+        memberRepository.updateMemberByUserIdAndUserPw(userId, userPw, originId);
+    }
+
+    @Override
+    public void deleteMemberByUserId(String userId) {
+        memberRepository.deleteMemberByUserId(userId);
+    }
+
+
 }
