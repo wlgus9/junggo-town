@@ -1,20 +1,27 @@
 package com.junggotown.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
-@Setter
 @Getter
-@ToString
 public class Member {
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    private String userId;
     private String userPw;
+    private String userName;
+    private String userTelno;
+
+    @Builder
+    public Member(String userId, String userPw, String userName, String userTelno) {
+        this.userId = userId;
+        this.userPw = userPw;
+        this.userName = userName;
+        this.userTelno = userTelno;
+    }
 }
