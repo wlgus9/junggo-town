@@ -3,32 +3,33 @@ package com.junggotown.service;
 import com.junggotown.domain.Member;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.MemberDto;
+import com.junggotown.global.JwtProvider;
 import com.junggotown.global.ResponseMessage;
 import com.junggotown.repository.MemberRepository;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+@Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    // private final BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtProvider jwtUtil;
 
+    @Transactional
     public ApiResponseDto join(MemberDto memberDto) {
         boolean isSuccess;
         String message;
 
         Member member = Member.builder()
                         .userId(memberDto.getUserId())
-                        // .userPw(passwordEncoder.encode(memberDto.getUserPw()))
+                        .userPw(passwordEncoder.encode(memberDto.getUserPw()))
                         .userName(memberDto.getUserName())
                         .userTelno(memberDto.getUserTelno())
                         .build();
@@ -63,20 +64,19 @@ public class MemberService {
     public ApiResponseDto login(MemberDto memberDto) {
         boolean isSuccess;
         String message;
-
-        Member member = Member.builder()
-                .userId(memberDto.getUserId())
-                .userPw(memberDto.getUserPw())
-                .build();
+        String token = "";
 
         try {
-            boolean isExists = memberRepository.existsByUserId(member.getUserId());
+            Member loginMember = Member.builder()
+                                    .userPw(memberRepository.findByUserId(memberDto.getUserId()).getUserPw())
+                                    .build();
 
-            if(isExists) {
+            if(passwordEncoder.matches(memberDto.getUserPw(), loginMember.getUserPw())) {
                 isSuccess = true;
                 message = ResponseMessage.LOGIN_SUCCESS;
+                token = jwtUtil.createAccessToken(memberDto); // 로그인 성공 시 토큰 발급
             } else {
-                isSuccess = false;
+                isSuccess = true;
                 message = ResponseMessage.LOGIN_FAIL;
             }
         } catch (Exception e) {
@@ -87,15 +87,7 @@ public class MemberService {
         return ApiResponseDto.builder()
                 .success(isSuccess)
                 .message(message)
+                .token(token)
                 .build();
     }
-
-    public MemberDto findByUserId(String userId) {
-        Member member = memberRepository.findByUserId(userId);
-        return MemberDto.builder()
-                .userId(member.getUserId())
-                .userPw(member.getUserPw())
-                .build();
-    }
-
 }

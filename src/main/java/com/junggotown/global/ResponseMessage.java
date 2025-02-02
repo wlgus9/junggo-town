@@ -9,4 +9,7 @@ public class ResponseMessage {
     public static final String MEMBER_CREATE_FAIL = "회원가입 실패";
     public static final String MEMBER_CREATE_FAIL_DUPLICATE = "중복된 아이디";
     public static final String DATABASE_ERROR = "데이터베이스 오류";
+    public static final String BOARD_WRTIE_SUCCESS = "글 작성 성공";
+    public static final String BOARD_WRTIE_FAIL = "글 작성 실패";
+
 }

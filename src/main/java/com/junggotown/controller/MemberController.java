@@ -27,6 +27,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "회원가입", description = "아이디(id)와 비밀번호(password)를 입력하여 회원가입합니다."
+            // , parameters = {@Parameter(name = "userId"), @Parameter(name = "userPw"), @Parameter(name = "userName"), @Parameter(name = "userTelno")}
             , responses = {
             @ApiResponse(responseCode = "200", description = "회원 가입 성공"
                     , content = @Content(
@@ -55,6 +56,7 @@ public class MemberController {
     })
     @PostMapping("/join")
     public ResponseEntity<ApiResponseDto> join(
+            @RequestBody
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "회원가입에 필요한 데이터",
@@ -63,10 +65,7 @@ public class MemberController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = MemberDto.class)
                     )) MemberDto memberDto) {
-        log.info("memberDto = {}", memberDto);
         ApiResponseDto apiResponseDto = memberService.join(memberDto);
-
-        log.info("apiResponseDto = {}", apiResponseDto);
 
         return ResponseEntity.status(apiResponseDto.isSuccess() ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponseDto);
     }

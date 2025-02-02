@@ -8,6 +8,7 @@ import lombok.*;
 
 @Getter
 @ToString
+@NoArgsConstructor
 @Schema(description = "사용자")
 public class MemberDto {
     @NotBlank

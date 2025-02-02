@@ -11,21 +11,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Member {
+public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userId;
-    private String userPw;
-    private String userName;
-    private String userTelno;
+    private String title;
+    private String description;
 
     @Builder
-    public Member(String userId, String userPw, String userName, String userTelno) {
+    public Board(String userId, String title, String description) {
         this.userId = userId;
-        this.userPw = userPw;
-        this.userName = userName;
-        this.userTelno = userTelno;
+        this.title = title;
+        this.description = description;
     }
 }
