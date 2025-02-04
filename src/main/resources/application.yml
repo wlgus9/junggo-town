@@ -1,0 +1,44 @@
+server:
+  servlet:
+    session:
+      tracking-modes: cookie
+
+
+spring:
+  application:
+    name: junggotown
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/junggo_town?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: gus
+    password: 0409
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+springdoc:
+  swagger-ui:
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+    defaultModelsExpandDepth: 2
+    defaultModelExpandDepth: 2
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+  model-and-view-allowed: true
+  paths-to-match:
+    - /api/v1/**
+  override-with-generic-response: false
+
+jwt:
+  expiration_time: 86400000 #1일
+  secret: zk+5IRIt90hfC7C1KwNVtX9TcjY8HT0/fZvmVrHIY+1ESeWbBfPW7HrNnXf+AtTdWg+LdbP4MBt3ued4ulNcjw==
