@@ -1,10 +1,13 @@
-package com.junggotown.dto;
+package com.junggotown.dto.member;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @ToString
@@ -46,5 +49,21 @@ public class MemberDto {
         this.userPw = userPw;
         this.userName = userName;
         this.userTelno = userTelno;
+    }
+
+    public static MemberDto getMemberDto(String userId, String userPw, String userName, String userTelno) {
+        return MemberDto.builder()
+                .userId(userId)
+                .userPw(userPw)
+                .userName(userName)
+                .userTelno(userTelno)
+                .build();
+    }
+
+    public static MemberDto getLoginDto(String userId, String userPw) {
+        return MemberDto.builder()
+                .userId(userId)
+                .userPw(userPw)
+                .build();
     }
 }

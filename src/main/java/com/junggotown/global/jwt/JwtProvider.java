@@ -1,6 +1,6 @@
-package com.junggotown.global;
+package com.junggotown.global.jwt;
 
-import com.junggotown.dto.MemberDto;
+import com.junggotown.dto.member.MemberDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -88,6 +88,16 @@ public class JwtProvider {
      */
     public String getUserId(String token) {
         return parseClaims(token).get("userId", String.class);
+    }
+
+
+    /**
+     * Request에서 userId 추출
+     * @param request
+     * @return userId
+     */
+    public String getUserId(HttpServletRequest request) {
+        return parseClaims(resolveToken(request)).get("userId", String.class);
     }
 
 

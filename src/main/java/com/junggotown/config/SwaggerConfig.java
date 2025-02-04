@@ -1,32 +1,15 @@
 package com.junggotown.config;
 
-import com.junggotown.global.JwtInterceptor;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class SwaggerConfig implements WebMvcConfigurer {
-    @Autowired
-    private JwtInterceptor jwtInterceptor;
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)
-                .order(1)
-                .addPathPatterns("/api/**")
-                .excludePathPatterns(
-                        "/swagger-ui/**",
-                        "/api/v1/members/**"
-                );
-    }
+public class SwaggerConfig {
 
     @Bean
     public OpenAPI api() {
@@ -43,13 +26,10 @@ public class SwaggerConfig implements WebMvcConfigurer {
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearerAuth", bearerAuth))  // Bearer 인증을 "bearerAuth"로 등록
                 .addSecurityItem(securityRequirement)
-                .info(info());
-    }
-
-    private Info info() {
-        return new Info()
-                .title("Junggo Town API")
-                .description("Junggo Town API reference for developers")
-                .version("1.0");
+                .info(new Info()
+                        .title("Junggo Town API")
+                        .description("Junggo Town API reference for developers")
+                        .version("1.0")
+                );
     }
 }

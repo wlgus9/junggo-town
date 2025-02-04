@@ -2,11 +2,12 @@ package com.junggotown.service;
 
 import com.junggotown.domain.Member;
 import com.junggotown.dto.ApiResponseDto;
-import com.junggotown.dto.MemberDto;
-import com.junggotown.global.JwtProvider;
-import com.junggotown.global.ResponseMessage;
+import com.junggotown.dto.member.MemberDto;
+import com.junggotown.dto.member.ResponseMemberDto;
+import com.junggotown.global.exception.member.MemberException;
+import com.junggotown.global.jwt.JwtProvider;
+import com.junggotown.global.message.ResponseMessage;
 import com.junggotown.repository.MemberRepository;
-import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,71 +24,24 @@ public class MemberService {
     private final JwtProvider jwtUtil;
 
     @Transactional
-    public ApiResponseDto join(MemberDto memberDto) {
-        boolean isSuccess;
-        String message;
+    public ApiResponseDto<ResponseMemberDto> join(MemberDto memberDto) throws MemberException {
+        Member member = Member.getMemberFromDto(memberDto, passwordEncoder);
 
-        Member member = Member.builder()
-                        .userId(memberDto.getUserId())
-                        .userPw(passwordEncoder.encode(memberDto.getUserPw()))
-                        .userName(memberDto.getUserName())
-                        .userTelno(memberDto.getUserTelno())
-                        .build();
-
-        boolean isExists = memberRepository.existsByUserId(member.getUserId());
-
-        if(isExists) {
-            return ApiResponseDto.builder()
-                    .success(false)
-                    .message(ResponseMessage.MEMBER_CREATE_FAIL_DUPLICATE)
-                    .build();
+        if(memberRepository.existsByUserId(member.getUserId())) {
+            throw new MemberException(ResponseMessage.MEMBER_JOIN_DUPLICATE.getMessage());
         }
 
-        try {
-            memberRepository.save(member);
-            isSuccess = true;
-            message = ResponseMessage.MEMBER_CREATE_SUCCESS;
-        } catch (PersistenceException e) {
-            isSuccess = false;
-            message = ResponseMessage.DATABASE_ERROR;
-        } catch (Exception e) {
-            isSuccess = false;
-            message = ResponseMessage.MEMBER_CREATE_FAIL;
-        }
-
-        return ApiResponseDto.builder()
-                .success(isSuccess)
-                .message(message)
-                .build();
+        Long id = memberRepository.save(member).getId();
+        return ApiResponseDto.response(ResponseMessage.MEMBER_JOIN_SUCCESS, ResponseMemberDto.fromId(id));
     }
 
-    public ApiResponseDto login(MemberDto memberDto) {
-        boolean isSuccess;
-        String message;
-        String token = "";
+    public ApiResponseDto<ResponseMemberDto> login(MemberDto memberDto) throws MemberException {
+        boolean passwordMatch = passwordEncoder.matches(memberDto.getUserPw(), memberRepository.findByUserId(memberDto.getUserId()).getUserPw());
 
-        try {
-            Member loginMember = Member.builder()
-                                    .userPw(memberRepository.findByUserId(memberDto.getUserId()).getUserPw())
-                                    .build();
-
-            if(passwordEncoder.matches(memberDto.getUserPw(), loginMember.getUserPw())) {
-                isSuccess = true;
-                message = ResponseMessage.LOGIN_SUCCESS;
-                token = jwtUtil.createAccessToken(memberDto); // 로그인 성공 시 토큰 발급
-            } else {
-                isSuccess = true;
-                message = ResponseMessage.LOGIN_FAIL;
-            }
-        } catch (Exception e) {
-            isSuccess = false;
-            message = ResponseMessage.LOGIN_FAIL;
+        if(passwordMatch) {
+            return ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS, ResponseMemberDto.fromToken(jwtUtil.createAccessToken(memberDto)));
+        } else {
+            throw new MemberException();
         }
-
-        return ApiResponseDto.builder()
-                .success(isSuccess)
-                .message(message)
-                .token(token)
-                .build();
     }
 }

@@ -1,19 +1,21 @@
-package com.junggotown.global;
+package com.junggotown.global.jwt;
 
-import io.jsonwebtoken.JwtException;
+import com.junggotown.global.exception.token.InvalidTokenException;
+import com.junggotown.global.exception.token.MissingTokenException;
+import com.junggotown.global.message.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -21,12 +23,11 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         String token = jwtProvider.resolveToken(request);
 
-        String url = request.getRequestURI();
         log.info("token = {}", token);
 
-        if(token == null) throw new JwtException("토큰이 없습니다.");
+        if(token == null) throw new MissingTokenException(ResponseMessage.MISSING_TOKEN.getMessage());
 
-        if(!jwtProvider.validateToken(token)) throw new JwtException("토큰이 유효하지 않습니다.");
+        if(!jwtProvider.validateToken(token)) throw new InvalidTokenException(ResponseMessage.INVALID_TOKEN.getMessage());
 
         String userId = jwtProvider.getUserId(token);
 

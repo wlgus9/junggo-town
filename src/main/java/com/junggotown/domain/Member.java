@@ -1,5 +1,6 @@
 package com.junggotown.domain;
 
+import com.junggotown.dto.member.MemberDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,6 +8,7 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @Getter
@@ -27,5 +29,14 @@ public class Member {
         this.userPw = userPw;
         this.userName = userName;
         this.userTelno = userTelno;
+    }
+
+    public static Member getMemberFromDto(MemberDto memberDto, BCryptPasswordEncoder passwordEncoder) {
+        return Member.builder()
+                .userId(memberDto.getUserId())
+                .userPw(passwordEncoder.encode(memberDto.getUserPw()))
+                .userName(memberDto.getUserName())
+                .userTelno(memberDto.getUserTelno())
+                .build();
     }
 }

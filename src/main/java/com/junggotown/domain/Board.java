@@ -1,5 +1,6 @@
 package com.junggotown.domain;
 
+import com.junggotown.dto.board.BoardDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,5 +26,13 @@ public class Board {
         this.userId = userId;
         this.title = title;
         this.description = description;
+    }
+
+    public static Board getBoardFromDto(BoardDto boardDto, String userId) {
+        return Board.builder()
+                .userId(userId)
+                .title(boardDto.getTitle())
+                .description(boardDto.getDescription())
+                .build();
     }
 }

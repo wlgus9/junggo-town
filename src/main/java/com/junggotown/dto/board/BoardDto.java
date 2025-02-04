@@ -1,4 +1,4 @@
-package com.junggotown.dto;
+package com.junggotown.dto.board;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -24,5 +24,12 @@ public class BoardDto {
     public BoardDto(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    public static BoardDto getBoardDto(String title, String description) {
+        return BoardDto.builder()
+                .title(title)
+                .description(description)
+                .build();
     }
 }
