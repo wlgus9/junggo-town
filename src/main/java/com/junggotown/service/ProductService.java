@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final JwtProvider jwtProvider;
 
-    @Transactional
     public ApiResponseDto<ResponseProductDto> create(ProductDto productDto, HttpServletRequest request) throws ProductException {
         Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
         Long id = productRepository.save(product).getId();
@@ -59,5 +59,31 @@ public class ProductService {
                     return ApiResponseDto.response(ResponseMessage.PRODUCT_SEARCH_SUCCESS, returnDto);
                 })
                 .orElseGet(() -> ApiResponseDto.response(ResponseMessage.PRODUCT_SEARCH_EMPTY));
+    }
+
+    public ApiResponseDto<ResponseProductDto> update(ProductDto productDto, HttpServletRequest request) throws ProductException {
+        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+
+        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
+
+        if(isExists != null) {
+            Optional<Product> result = productRepository.findById(productRepository.save(product).getId());
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_UPDATE_SUCCESS, ResponseProductDto.getSearchDto(result.get()));
+        } else {
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+        }
+    }
+
+    public ApiResponseDto<ResponseProductDto> delete(ProductDto productDto, HttpServletRequest request) throws ProductException {
+        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+
+        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
+
+        if(isExists != null) {
+            productRepository.deleteById(product.getId());
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_DELETE_SUCCESS);
+        } else {
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+        }
     }
 }

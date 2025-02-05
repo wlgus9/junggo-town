@@ -65,4 +65,14 @@ public class ProductDto {
                 .build();
 
     }
+
+    public static ProductDto getUpdateDto(Long productId, ProductDto productDto) {
+        return ProductDto.builder()
+                .productId(productId)
+                .productName(productDto.getProductName())
+                .productDescription(productDto.getProductDescription())
+                .price(productDto.getPrice())
+                .build();
+
+    }
 }

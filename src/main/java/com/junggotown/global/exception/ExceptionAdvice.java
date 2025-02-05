@@ -47,11 +47,17 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(ProductException.class)
-    public ResponseEntity<ExceptionResponseDto> boardException(HttpServletRequest request) {
-        if(request.getRequestURI().contains("create")) {
+    public ResponseEntity<ExceptionResponseDto> productException(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        if(uri.contains("create")) {
             return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_CREATE_FAIL);
-        } else {
+        } else if(uri.contains("search")) {
             return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_SEARCH_FAIL);
+        } else if(uri.contains("update")){
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_UPDATE_FAIL);
+        } else {
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_DELETE_FAIL);
         }
     }
 }

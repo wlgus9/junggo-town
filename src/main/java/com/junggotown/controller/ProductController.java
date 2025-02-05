@@ -40,4 +40,16 @@ public class ProductController {
     public ApiResponseDto<List<ResponseProductDto>> searchByUserId(@RequestParam("userId") String userId) {
         return productService.searchByUserId(ProductDto.getSearchDto(userId));
     }
+
+    @Operation(summary = "상품 정보 수정", description = "상품 아이디를 입력하여 상품 정보를 수정합니다.")
+    @PatchMapping("/update/{productId}")
+    public ApiResponseDto<ResponseProductDto> update(@PathVariable Long productId, @RequestBody @Valid ProductDto productDto, HttpServletRequest request) {
+        return productService.update(ProductDto.getUpdateDto(productId, productDto), request);
+    }
+
+    @Operation(summary = "상품 삭제", description = "상품 아이디를 입력하여 상품을 삭제합니다.")
+    @DeleteMapping("/delete/{productId}")
+    public ApiResponseDto<ResponseProductDto> delete(@PathVariable Long productId, HttpServletRequest request) {
+        return productService.delete(ProductDto.getSearchDto(productId), request);
+    }
 }
