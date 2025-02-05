@@ -1,7 +1,7 @@
 package com.junggotown.global.exception;
 
 import com.junggotown.dto.ExceptionResponseDto;
-import com.junggotown.global.exception.board.BoardException;
+import com.junggotown.global.exception.product.ProductException;
 import com.junggotown.global.exception.member.MemberException;
 import com.junggotown.global.exception.token.InvalidTokenException;
 import com.junggotown.global.exception.token.MissingTokenException;
@@ -46,12 +46,12 @@ public class ExceptionAdvice {
         }
     }
 
-    @ExceptionHandler(BoardException.class)
+    @ExceptionHandler(ProductException.class)
     public ResponseEntity<ExceptionResponseDto> boardException(HttpServletRequest request) {
-        if(request.getRequestURI().contains("write")) {
-            return ExceptionResponseDto.toResponseEntity(ResponseMessage.BOARD_WRITE_FAIL);
+        if(request.getRequestURI().contains("create")) {
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_CREATE_FAIL);
         } else {
-            return ExceptionResponseDto.toResponseEntity(ResponseMessage.BOARD_WRITE_FAIL);
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_SEARCH_FAIL);
         }
     }
 }
