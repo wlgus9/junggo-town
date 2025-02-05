@@ -15,6 +15,8 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import java.security.Key;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * [JWT 관련 메서드를 제공하는 클래스]
@@ -27,6 +29,7 @@ public class JwtProvider {
 
     private final Key key; // JWT secret key
     private final long accessTokenExpTime; // 토큰 유효기간
+    private final Map<String, String> tokenCache = new ConcurrentHashMap<>(); // 토큰 캐시
 
     public JwtProvider(
             @Value("${jwt.secret}") String secretKey,
@@ -53,18 +56,30 @@ public class JwtProvider {
      * @return JWT String
      */
     private String createToken(MemberDto member, long expireTime) {
+        String userId = member.getUserId();
+        String existingToken = tokenCache.get(userId);
+
+        // 기존 토큰이 유효하면 재사용
+        if (existingToken != null && !validateToken(existingToken)) {
+            return existingToken;
+        }
+
         Claims claims = Jwts.claims();
-        claims.put("userId", member.getUserId());
+        claims.put("userId", userId);
 
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expireTime);
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(Date.from(now.toInstant()))
                 .setExpiration(Date.from(tokenValidity.toInstant()))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        tokenCache.put(userId, token);
+
+        return token;
     }
 
     /**

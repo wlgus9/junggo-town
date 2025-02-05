@@ -1,7 +1,7 @@
 package com.junggotown.global.exception;
 
 import com.junggotown.dto.ExceptionResponseDto;
-import com.junggotown.global.exception.board.BoardException;
+import com.junggotown.global.exception.product.ProductException;
 import com.junggotown.global.exception.member.MemberException;
 import com.junggotown.global.exception.token.InvalidTokenException;
 import com.junggotown.global.exception.token.MissingTokenException;
@@ -46,12 +46,18 @@ public class ExceptionAdvice {
         }
     }
 
-    @ExceptionHandler(BoardException.class)
-    public ResponseEntity<ExceptionResponseDto> boardException(HttpServletRequest request) {
-        if(request.getRequestURI().contains("write")) {
-            return ExceptionResponseDto.toResponseEntity(ResponseMessage.BOARD_WRITE_FAIL);
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<ExceptionResponseDto> productException(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        if(uri.contains("create")) {
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_CREATE_FAIL);
+        } else if(uri.contains("search")) {
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_SEARCH_FAIL);
+        } else if(uri.contains("update")){
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_UPDATE_FAIL);
         } else {
-            return ExceptionResponseDto.toResponseEntity(ResponseMessage.BOARD_WRITE_FAIL);
+            return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_DELETE_FAIL);
         }
     }
 }

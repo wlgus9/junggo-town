@@ -1,4 +1,4 @@
-package com.junggotown.config;
+package com.junggotown.global.config;
 
 import com.junggotown.global.jwt.JwtInterceptor;
 import lombok.RequiredArgsConstructor;

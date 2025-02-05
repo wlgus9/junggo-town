@@ -32,14 +32,14 @@ public class MemberService {
         }
 
         Long id = memberRepository.save(member).getId();
-        return ApiResponseDto.response(ResponseMessage.MEMBER_JOIN_SUCCESS, ResponseMemberDto.fromId(id));
+        return ApiResponseDto.response(ResponseMessage.MEMBER_JOIN_SUCCESS, ResponseMemberDto.getJoinDto(id));
     }
 
     public ApiResponseDto<ResponseMemberDto> login(MemberDto memberDto) throws MemberException {
         boolean passwordMatch = passwordEncoder.matches(memberDto.getUserPw(), memberRepository.findByUserId(memberDto.getUserId()).getUserPw());
 
         if(passwordMatch) {
-            return ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS, ResponseMemberDto.fromToken(jwtUtil.createAccessToken(memberDto)));
+            return ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS, ResponseMemberDto.getLoginDto(jwtUtil.createAccessToken(memberDto)));
         } else {
             throw new MemberException();
         }
