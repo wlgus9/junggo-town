@@ -46,6 +46,8 @@ public class ProductTest {
     private final String CREATE_URL = "/api/v1/products/create";
     private final String SEARCH_URL = "/api/v1/products/search?";
     private final String UPDATE_URL = "/api/v1/products/update?productId=";
+    private final String SALESTOP_URL = "/api/v1/products/salestop?productId=";
+    private final String SOLDOUT_URL = "/api/v1/products/soldout?productId=";
     private final String DELETE_URL = "/api/v1/products/delete?productId=";
 
     @BeforeEach
@@ -124,6 +126,38 @@ public class ProductTest {
         ProductDto updateDto = ProductDto.getCreateDto("updateName", "updateDesc", BigDecimal.valueOf(20000));
 
         JsonNode response = TestUtil.performPatchRequestAndGetResponse(mockMvc, UPDATE_URL+"4", userId, token, updateDto, HttpStatus.OK);
+        assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
+    }
+
+    @Test
+    void 핀메중지_성공() throws Exception {
+        상품_등록_성공();
+
+        JsonNode response = TestUtil.performPatchRequestAndGetResponse(mockMvc, SALESTOP_URL+"1", userId, token, null, HttpStatus.OK);
+        assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_SALESTOP_SUCCESS.getMessage());
+    }
+
+    @Test
+    void 핀메중지_실패_다른사람상품() throws Exception {
+        상품_등록_성공();
+
+        JsonNode response = TestUtil.performPatchRequestAndGetResponse(mockMvc, SALESTOP_URL+"4", userId, token, null, HttpStatus.OK);
+        assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
+    }
+
+    @Test
+    void 핀메완료_성공() throws Exception {
+        상품_등록_성공();
+
+        JsonNode response = TestUtil.performPatchRequestAndGetResponse(mockMvc, SOLDOUT_URL+"1", userId, token, null, HttpStatus.OK);
+        assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_SOLDOUT_SUCCESS.getMessage());
+    }
+
+    @Test
+    void 핀메왼료_실패_다른사람상품() throws Exception {
+        상품_등록_성공();
+
+        JsonNode response = TestUtil.performPatchRequestAndGetResponse(mockMvc, SOLDOUT_URL+"4", userId, token, null, HttpStatus.OK);
         assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
     }
 

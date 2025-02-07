@@ -49,7 +49,7 @@ public class ChatService {
         return ApiResponseDto.response(ResponseMessage.CHAT_SEND_SUCCESS, ResponseChatDto.getSendDto(chat, id));
     }
 
-    public ApiResponseDto<List<ResponseChatDto>> searchByProductIdAndUserId(Long productId, HttpServletRequest request) throws ChatException {
+    public ApiResponseDto<List<ResponseChatDto>> search(Long productId, HttpServletRequest request) throws ChatException {
         Optional<List<Chat>> chatList = chatRepository.findByProductIdAndUserId(productId, jwtProvider.getUserId(request));
 
         return chatList

@@ -47,6 +47,18 @@ public class ProductController {
         return productService.update(ProductDto.getUpdateDto(productId, productDto), request);
     }
 
+    @Operation(summary = "판매 중지", description = "상품 아이디를 입력하여 상품 상태를 판매중지로 변경합니다.")
+    @PatchMapping("/salestop")
+    public ApiResponseDto<ResponseProductDto> saleStop(@RequestParam("productId") Long productId, HttpServletRequest request) {
+        return productService.saleStop(ProductDto.getSearchDto(productId), request);
+    }
+
+    @Operation(summary = "판매 완료", description = "상품 아이디를 입력하여 상품 상태를 판매완료로 변경합니다.")
+    @PatchMapping("/soldout")
+    public ApiResponseDto<ResponseProductDto> soldOut(@RequestParam("productId") Long productId, HttpServletRequest request) {
+        return productService.soldOut(ProductDto.getSearchDto(productId), request);
+    }
+
     @Operation(summary = "상품 삭제", description = "상품 아이디를 입력하여 상품을 삭제합니다.")
     @DeleteMapping("/delete")
     public ApiResponseDto<ResponseProductDto> delete(@RequestParam("productId") Long productId, HttpServletRequest request) {

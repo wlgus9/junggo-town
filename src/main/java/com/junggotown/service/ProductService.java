@@ -6,6 +6,7 @@ import com.junggotown.dto.product.ProductDto;
 import com.junggotown.dto.product.ResponseProductDto;
 import com.junggotown.global.exception.product.ProductException;
 import com.junggotown.global.jwt.JwtProvider;
+import com.junggotown.global.message.ProductStatus;
 import com.junggotown.global.message.ResponseMessage;
 import com.junggotown.repository.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,6 +70,32 @@ public class ProductService {
         if(isExists != null) {
             Optional<Product> result = productRepository.findById(productRepository.save(product).getId());
             return ApiResponseDto.response(ResponseMessage.PRODUCT_UPDATE_SUCCESS, ResponseProductDto.getSearchDto(result.get()));
+        } else {
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+        }
+    }
+
+    public ApiResponseDto<ResponseProductDto> saleStop(ProductDto productDto, HttpServletRequest request) {
+        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+
+        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
+
+        if(isExists != null) {
+            product.changeStatus(ProductStatus.SALE_STOP);
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_SALESTOP_SUCCESS);
+        } else {
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+        }
+    }
+
+    public ApiResponseDto<ResponseProductDto> soldOut(ProductDto productDto, HttpServletRequest request) {
+        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+
+        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
+
+        if(isExists != null) {
+            product.changeStatus(ProductStatus.SOLD_OUT);
+            return ApiResponseDto.response(ResponseMessage.PRODUCT_SOLDOUT_SUCCESS);
         } else {
             return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
         }

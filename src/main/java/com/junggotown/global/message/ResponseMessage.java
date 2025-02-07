@@ -13,6 +13,8 @@ public enum ResponseMessage {
     , PRODUCT_SEARCH_SUCCESS(HttpStatus.OK, "등록한 상품이 조회되었습니다.")
     , PRODUCT_IS_EMPTY(HttpStatus.OK, "등록한 상품이 없습니다.")
     , PRODUCT_UPDATE_SUCCESS(HttpStatus.OK, "상품 정보 수정이 완료되었습니다.")
+    , PRODUCT_SALESTOP_SUCCESS(HttpStatus.OK, "상품 상태가 판매중지로 변경되었습니다.")
+    , PRODUCT_SOLDOUT_SUCCESS(HttpStatus.OK, "상품 상태가 판매완료로 변경되었습니다.")
     , PRODUCT_DELETE_SUCCESS(HttpStatus.OK, "상품 삭제가 완료되었습니다.")
     , CHAT_SEND_SUCCESS(HttpStatus.OK, "채팅 발신이 완료되었습니다.")
     , CHAT_SEARCH_SUCCESS(HttpStatus.OK, "채팅 조회가 완료되었습니다.")

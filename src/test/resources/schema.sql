@@ -16,6 +16,7 @@ CREATE TABLE product (
     product_name VARCHAR(100) NOT NULL COMMENT '상품 이름',
     product_description VARCHAR(255) DEFAULT NULL COMMENT '상품 설명',
     price DECIMAL(10, 2) NOT NULL COMMENT '상품 가격',
+    sales_status int not null default 1 comment '판매 상태',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
     PRIMARY KEY (id)

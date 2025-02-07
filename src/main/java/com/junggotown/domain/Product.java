@@ -2,6 +2,7 @@ package com.junggotown.domain;
 
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.global.entity.BaseEntity;
+import com.junggotown.global.message.ProductStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class Product extends BaseEntity {
     private String productName;
     private String productDescription;
     private BigDecimal price;
+    private int sales_status = ProductStatus.ON_SALE.getCode();
 
     @Builder
     public Product(Long id, String userId, String productName, String productDescription, BigDecimal price) {
@@ -52,5 +54,10 @@ public class Product extends BaseEntity {
                 .productDescription(productDto.getProductDescription())
                 .price(productDto.getPrice())
                 .build();
+    }
+
+    // 판매 상태 변경 메서드
+    public void changeStatus(ProductStatus newStatus) {
+        this.sales_status = newStatus.getCode();
     }
 }
