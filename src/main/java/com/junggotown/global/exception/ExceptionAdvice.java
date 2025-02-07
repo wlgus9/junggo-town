@@ -1,6 +1,7 @@
 package com.junggotown.global.exception;
 
 import com.junggotown.dto.ExceptionResponseDto;
+import com.junggotown.global.exception.chat.ChatException;
 import com.junggotown.global.exception.product.ProductException;
 import com.junggotown.global.exception.member.MemberException;
 import com.junggotown.global.exception.token.InvalidTokenException;
@@ -59,5 +60,11 @@ public class ExceptionAdvice {
         } else {
             return ExceptionResponseDto.toResponseEntity(ResponseMessage.PRODUCT_DELETE_FAIL);
         }
+    }
+
+
+    @ExceptionHandler(ChatException.class)
+    public ResponseEntity<ExceptionResponseDto> chatException(HttpServletRequest request) {
+        return ExceptionResponseDto.toResponseEntity(ResponseMessage.CHAT_SEND_FAIL);
     }
 }

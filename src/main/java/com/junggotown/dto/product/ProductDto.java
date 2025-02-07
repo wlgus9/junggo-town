@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Getter
 @ToString
 @NoArgsConstructor
-@Schema(description = "중고거래 글")
+@Schema(description = "중고거래 상품")
 public class ProductDto {
     @NotBlank
     @Size(min = 4, max = 100, message = "상품 이름은 4~100자여야 합니다.")
@@ -30,10 +30,10 @@ public class ProductDto {
     @Schema(description = "상품 가격")
     private BigDecimal price;
 
-    @Schema(description = "사용자 아이디")
+    @Schema(description = "사용자 아이디", hidden = true)
     private String userId;
 
-    @Schema(description = "상품 아이디")
+    @Schema(description = "상품 아이디", hidden = true)
     private Long productId;
 
     @Builder
