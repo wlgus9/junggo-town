@@ -25,7 +25,7 @@ public class Product extends BaseEntity {
     private String productName;
     private String productDescription;
     private BigDecimal price;
-    private int sales_status = ProductStatus.ON_SALE.getCode();
+    private int salesStatus = ProductStatus.ON_SALE.getCode();
 
     @Builder
     public Product(Long id, String userId, String productName, String productDescription, BigDecimal price) {
@@ -58,6 +58,6 @@ public class Product extends BaseEntity {
 
     // 판매 상태 변경 메서드
     public void changeStatus(ProductStatus newStatus) {
-        this.sales_status = newStatus.getCode();
+        this.salesStatus = newStatus.getCode();
     }
 }

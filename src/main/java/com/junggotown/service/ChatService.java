@@ -9,12 +9,14 @@ import com.junggotown.global.exception.chat.ChatException;
 import com.junggotown.global.jwt.JwtProvider;
 import com.junggotown.global.message.ResponseMessage;
 import com.junggotown.repository.ChatRepository;
+import com.junggotown.repository.ChatRoomRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class ChatService {
 
     private final ChatRoomService chatRoomService;
     private final ChatRepository chatRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final JwtProvider jwtProvider;
 
     public ApiResponseDto<ResponseChatDto> send(ChatDto chatDto, HttpServletRequest request) throws ChatException {
@@ -40,7 +43,7 @@ public class ChatService {
                 : chatRoom.getSellerId(); // 보낸 사람이 구매자면, 받는 사람은 판매자
 
         // 메시지 저장
-        Chat chat = Chat.getChatFromDto(ChatDto.getCreateDto(chatDto, sendUserId, receiveUserId));
+        Chat chat = Chat.getChatFromDto(ChatDto.getCreateDto(chatDto, sendUserId, receiveUserId), chatRoom);
 
         Long id = chatRepository.save(chat).getId();
 
@@ -61,17 +64,31 @@ public class ChatService {
                 .orElseGet(() -> ApiResponseDto.response(ResponseMessage.CHAT_IS_EMPTY));
     }
 
-    public ApiResponseDto<List<ResponseChatDto>> searchAll(HttpServletRequest request) throws ChatException {
-        Optional<List<Chat>> chatList = chatRepository.findByUserId(jwtProvider.getUserId(request));
+    public ApiResponseDto<Map<String, List<ResponseChatDto>>> searchAll(HttpServletRequest request) throws ChatException {
+        String userId = jwtProvider.getUserId(request);
 
-        return chatList
-                .filter(chats -> !chats.isEmpty())
-                .map(chats -> {
-                    List<ResponseChatDto> returnDto = chats.stream()
-                            .map(ResponseChatDto::getSendDto)
-                            .collect(Collectors.toList());
-                    return ApiResponseDto.response(ResponseMessage.CHAT_SEARCH_SUCCESS, returnDto);
-                })
-                .orElseGet(() -> ApiResponseDto.response(ResponseMessage.CHAT_IS_EMPTY));
+        // 사용자가 포함된 모든 채팅방 조회
+        List<ChatRoom> chatRooms = chatRoomRepository.findByUserIdIn(userId);
+
+        if (chatRooms.isEmpty()) {
+            return ApiResponseDto.response(ResponseMessage.CHAT_IS_EMPTY);
+        }
+
+        // 채팅방 ID 리스트 추출
+        List<String> chatRoomIds = chatRooms.stream()
+                .map(ChatRoom::getChatRoomId)
+                .collect(Collectors.toList());
+
+        // 해당 채팅방들에 속한 채팅 메시지 조회
+        List<Chat> chatList = chatRepository.findByChatRoom_ChatRoomIdIn(chatRoomIds);
+
+        // 채팅방 ID 기준으로 그룹화
+        Map<String, List<ResponseChatDto>> groupedChats = chatList.stream()
+                .collect(Collectors.groupingBy(
+                        Chat::getChatRoomId,
+                        Collectors.mapping(chat -> ResponseChatDto.getSendDtoChatRoomId(chat, chat.getChatRoomId()), Collectors.toList())
+                ));
+
+        return ApiResponseDto.response(ResponseMessage.CHAT_SEARCH_SUCCESS, groupedChats);
     }
 }

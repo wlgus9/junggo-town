@@ -29,14 +29,14 @@ public class ProductService {
     private final JwtProvider jwtProvider;
 
     public ApiResponseDto<ResponseProductDto> create(ProductDto productDto, HttpServletRequest request) throws ProductException {
-        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+        Product product = getEntity(productDto, request);
         Long id = productRepository.save(product).getId();
 
         return ApiResponseDto.response(ResponseMessage.PRODUCT_CREATE_SUCCESS, ResponseProductDto.getCreateDto(id));
     }
 
     public ApiResponseDto<ResponseProductDto> searchByProductId(ProductDto productDto, HttpServletRequest request) throws ProductException {
-        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+        Product product = getEntity(productDto, request);
 
         Product result = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
 
@@ -63,11 +63,9 @@ public class ProductService {
     }
 
     public ApiResponseDto<ResponseProductDto> update(ProductDto productDto, HttpServletRequest request) throws ProductException {
-        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+        Product product = getEntity(productDto, request);
 
-        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
-
-        if(isExists != null) {
+        if(productIsMine(product)) {
             Optional<Product> result = productRepository.findById(productRepository.save(product).getId());
             return ApiResponseDto.response(ResponseMessage.PRODUCT_UPDATE_SUCCESS, ResponseProductDto.getSearchDto(result.get()));
         } else {
@@ -76,11 +74,9 @@ public class ProductService {
     }
 
     public ApiResponseDto<ResponseProductDto> saleStop(ProductDto productDto, HttpServletRequest request) {
-        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+        Product product = getEntity(productDto, request);
 
-        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
-
-        if(isExists != null) {
+        if(productIsMine(product)) {
             product.changeStatus(ProductStatus.SALE_STOP);
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SALESTOP_SUCCESS);
         } else {
@@ -89,11 +85,9 @@ public class ProductService {
     }
 
     public ApiResponseDto<ResponseProductDto> soldOut(ProductDto productDto, HttpServletRequest request) {
-        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+        Product product = getEntity(productDto, request);
 
-        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
-
-        if(isExists != null) {
+        if(productIsMine(product)) {
             product.changeStatus(ProductStatus.SOLD_OUT);
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SOLDOUT_SUCCESS);
         } else {
@@ -102,15 +96,21 @@ public class ProductService {
     }
 
     public ApiResponseDto<ResponseProductDto> delete(ProductDto productDto, HttpServletRequest request) throws ProductException {
-        Product product = Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+        Product product = getEntity(productDto, request);
 
-        Product isExists = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
-
-        if(isExists != null) {
+        if(productIsMine(product)) {
             productRepository.deleteById(product.getId());
             return ApiResponseDto.response(ResponseMessage.PRODUCT_DELETE_SUCCESS);
         } else {
             throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
         }
+    }
+
+    public Product getEntity(ProductDto productDto, HttpServletRequest request) {
+        return Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
+    }
+
+    public boolean productIsMine(Product product) {
+        return productRepository.findByIdAndUserId(product.getId(), product.getUserId()) != null;
     }
 }

@@ -31,7 +31,6 @@ public enum ResponseMessage {
     , PRODUCT_IS_NOT_EXISTS(HttpStatus.BAD_REQUEST, "해당 상품은 존재하지 않습니다.")
     , PRODUCT_BUYER_IS_NOT_EXISTS(HttpStatus.BAD_REQUEST, "구매자가 존재하지 않습니다.")
     , CHAT_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "채팅 발신에 실패했습니다.")
-    , CHAT_SEARCH_FAIL(HttpStatus.BAD_REQUEST, "채팅 조회에 실패했습니다.")
     , MISSING_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 존재하지 않습니다.")
     , INVALID_TOKEN(HttpStatus.FORBIDDEN, "토큰이 유효하지 않습니다.");
 

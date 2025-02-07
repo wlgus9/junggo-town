@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -37,7 +38,7 @@ public class ChatController {
 
     @Operation(summary = "채팅 전체 조회", description = "나의 채팅 내역 전체를 조회합니다.")
     @GetMapping("/searchall")
-    public ApiResponseDto<List<ResponseChatDto>> searchAll(HttpServletRequest request) {
+    public ApiResponseDto<Map<String, List<ResponseChatDto>>> searchAll(HttpServletRequest request) {
         return chatService.searchAll(request);
     }
 }
