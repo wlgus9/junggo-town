@@ -9,7 +9,6 @@ import com.junggotown.global.exception.chat.ChatException;
 import com.junggotown.global.jwt.JwtProvider;
 import com.junggotown.global.message.ResponseMessage;
 import com.junggotown.repository.ChatRepository;
-import com.junggotown.repository.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,6 @@ public class ChatService {
 
     private final ChatRoomService chatRoomService;
     private final ChatRepository chatRepository;
-    private final ProductRepository productRepository;
     private final JwtProvider jwtProvider;
 
     public ApiResponseDto<ResponseChatDto> send(ChatDto chatDto, HttpServletRequest request) throws ChatException {

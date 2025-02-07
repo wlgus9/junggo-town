@@ -43,7 +43,7 @@ public class ProductService {
         if(result != null) {
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SEARCH_SUCCESS, ResponseProductDto.getSearchDto(result));
         } else {
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ public class ProductService {
             Optional<Product> result = productRepository.findById(productRepository.save(product).getId());
             return ApiResponseDto.response(ResponseMessage.PRODUCT_UPDATE_SUCCESS, ResponseProductDto.getSearchDto(result.get()));
         } else {
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
         }
     }
 
@@ -84,7 +84,7 @@ public class ProductService {
             product.changeStatus(ProductStatus.SALE_STOP);
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SALESTOP_SUCCESS);
         } else {
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
         }
     }
 
@@ -97,7 +97,7 @@ public class ProductService {
             product.changeStatus(ProductStatus.SOLD_OUT);
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SOLDOUT_SUCCESS);
         } else {
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
         }
     }
 
@@ -110,7 +110,7 @@ public class ProductService {
             productRepository.deleteById(product.getId());
             return ApiResponseDto.response(ResponseMessage.PRODUCT_DELETE_SUCCESS);
         } else {
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_IS_NOT_YOURS);
+            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
         }
     }
 }
