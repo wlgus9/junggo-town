@@ -58,7 +58,7 @@ public class ProductService {
                             .collect(Collectors.toList());
                     return ApiResponseDto.response(ResponseMessage.PRODUCT_SEARCH_SUCCESS, returnDto);
                 })
-                .orElseGet(() -> ApiResponseDto.response(ResponseMessage.PRODUCT_SEARCH_EMPTY));
+                .orElseGet(() -> ApiResponseDto.response(ResponseMessage.PRODUCT_IS_EMPTY));
     }
 
     public ApiResponseDto<ResponseProductDto> update(ProductDto productDto, HttpServletRequest request) throws ProductException {
