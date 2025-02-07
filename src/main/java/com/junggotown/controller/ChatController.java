@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -31,13 +32,13 @@ public class ChatController {
 
     @Operation(summary = "채팅 조회", description = "상품 아이디를 입력하여 해당 상품에 대한 나의 채팅 내역을 조회합니다.")
     @GetMapping("/search")
-    public ApiResponseDto<List<ResponseChatDto>> searchByProductIdAndUserId(@RequestParam("productId") Long productId, HttpServletRequest request) {
-        return chatService.searchByProductIdAndUserId(productId, request);
+    public ApiResponseDto<List<ResponseChatDto>> search(@RequestParam("productId") Long productId, HttpServletRequest request) {
+        return chatService.search(productId, request);
     }
 
     @Operation(summary = "채팅 전체 조회", description = "나의 채팅 내역 전체를 조회합니다.")
-    @GetMapping("/searchAll")
-    public ApiResponseDto<List<ResponseChatDto>> searchByUserId(HttpServletRequest request) {
+    @GetMapping("/searchall")
+    public ApiResponseDto<Map<String, List<ResponseChatDto>>> searchAll(HttpServletRequest request) {
         return chatService.searchAll(request);
     }
 }

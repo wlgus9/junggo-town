@@ -16,4 +16,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c FROM Chat c WHERE c.sendUserId = :userId OR c.receiveUserId = :userId ORDER BY c.createdAt ASC")
     Optional<List<Chat>> findByUserId(String userId);
+
+    List<Chat> findByChatRoom_ChatRoomIdIn(List<String> chatRoomIds);
 }

@@ -53,7 +53,7 @@ public class ChatTest {
     private final String CREATE_URL = "/api/v1/products/create";
     private final String SEND_URL = "/api/v1/chat/send";
     private final String SEARCH_URL = "/api/v1/chat/search?productId=";
-    private final String SEARCH_ALL_URL = "/api/v1/chat/searchAll";
+    private final String SEARCH_ALL_URL = "/api/v1/chat/searchall";
 
     @BeforeEach
     void 로그인() {
