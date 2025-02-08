@@ -2,7 +2,7 @@ package com.junggotown.global.jwt;
 
 import com.junggotown.global.exception.token.InvalidTokenException;
 import com.junggotown.global.exception.token.MissingTokenException;
-import com.junggotown.global.message.ResponseMessage;
+import com.junggotown.global.commonEnum.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

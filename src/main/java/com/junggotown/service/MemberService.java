@@ -6,7 +6,7 @@ import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
 import com.junggotown.global.exception.member.MemberException;
 import com.junggotown.global.jwt.JwtProvider;
-import com.junggotown.global.message.ResponseMessage;
+import com.junggotown.global.commonEnum.ResponseMessage;
 import com.junggotown.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

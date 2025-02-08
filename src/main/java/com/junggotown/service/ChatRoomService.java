@@ -3,7 +3,7 @@ package com.junggotown.service;
 import com.junggotown.domain.ChatRoom;
 import com.junggotown.domain.Product;
 import com.junggotown.global.exception.product.ProductException;
-import com.junggotown.global.message.ResponseMessage;
+import com.junggotown.global.commonEnum.ResponseMessage;
 import com.junggotown.repository.ChatRoomRepository;
 import com.junggotown.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;

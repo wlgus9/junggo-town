@@ -7,17 +7,18 @@ server:
 spring:
   application:
     name: junggotown
-
   datasource:
     url: jdbc:mysql://localhost:3306/junggo_town?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: gus
     password: 0409
-
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: none
+  output:
+    ansi:
+      enabled: always
 
 springdoc:
   swagger-ui:

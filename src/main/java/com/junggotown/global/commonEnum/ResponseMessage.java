@@ -1,4 +1,4 @@
-package com.junggotown.global.message;
+package com.junggotown.global.commonEnum;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
