@@ -7,7 +7,7 @@ import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
 import com.junggotown.dto.product.ProductDto;
-import com.junggotown.global.message.ResponseMessage;
+import com.junggotown.global.commonEnum.ResponseMessage;
 import com.junggotown.service.MemberService;
 import com.junggotown.service.ProductService;
 import jakarta.transaction.Transactional;

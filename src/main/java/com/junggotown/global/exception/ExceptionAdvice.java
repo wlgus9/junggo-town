@@ -6,7 +6,7 @@ import com.junggotown.global.exception.product.ProductException;
 import com.junggotown.global.exception.member.MemberException;
 import com.junggotown.global.exception.token.InvalidTokenException;
 import com.junggotown.global.exception.token.MissingTokenException;
-import com.junggotown.global.message.ResponseMessage;
+import com.junggotown.global.commonEnum.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

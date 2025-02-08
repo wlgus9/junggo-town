@@ -2,7 +2,7 @@ package com.junggotown.domain;
 
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.global.entity.BaseEntity;
-import com.junggotown.global.message.ProductStatus;
+import com.junggotown.global.commonEnum.ProductStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

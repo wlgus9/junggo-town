@@ -7,7 +7,7 @@ import com.junggotown.dto.chat.ChatDto;
 import com.junggotown.dto.chat.ResponseChatDto;
 import com.junggotown.global.exception.chat.ChatException;
 import com.junggotown.global.jwt.JwtProvider;
-import com.junggotown.global.message.ResponseMessage;
+import com.junggotown.global.commonEnum.ResponseMessage;
 import com.junggotown.repository.ChatRepository;
 import com.junggotown.repository.ChatRoomRepository;
 import jakarta.servlet.http.HttpServletRequest;
