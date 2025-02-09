@@ -6,9 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -24,9 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class JwtProvider {
-    @Autowired
-    private ConfigurableEnvironment environment;
-
     private final Key key; // JWT secret key
     private final long accessTokenExpTime; // 토큰 유효기간
     private final Map<String, String> tokenCache = new ConcurrentHashMap<>(); // 토큰 캐시

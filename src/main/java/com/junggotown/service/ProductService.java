@@ -35,6 +35,16 @@ public class ProductService {
         return ApiResponseDto.response(ResponseMessage.PRODUCT_CREATE_SUCCESS, ResponseProductDto.getCreateDto(id));
     }
 
+    // 가상계좌 발급에 필요한 상품 정보 조회
+    public Product getProductInfo(Long productId, HttpServletRequest request) throws ProductException {
+        Product product = getEntity(ProductDto.getSearchDto(productId), request);
+
+        Product result = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
+
+        return Optional.ofNullable(result)
+                .orElseThrow(() -> new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage()));
+    }
+
     public ApiResponseDto<ResponseProductDto> searchByProductId(ProductDto productDto, HttpServletRequest request) throws ProductException {
         Product product = getEntity(productDto, request);
 
