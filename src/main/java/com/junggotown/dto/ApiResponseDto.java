@@ -1,6 +1,6 @@
 package com.junggotown.dto;
 
-import com.junggotown.global.commonEnum.ResponseMessage;
+import com.junggotown.global.common.ResponseMessage;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

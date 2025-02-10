@@ -1,6 +1,6 @@
 package com.junggotown.domain;
 
-import com.junggotown.global.commonEnum.PaymentStatus;
+import com.junggotown.global.common.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

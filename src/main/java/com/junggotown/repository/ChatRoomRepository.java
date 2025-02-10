@@ -13,5 +13,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
     Optional<ChatRoom> findByProductIdAndBuyerId(Long productId, String buyerId);
 
     @Query("SELECT cr FROM ChatRoom cr WHERE :userId IN (cr.buyerId, cr.sellerId)")
-    List<ChatRoom> findByUserIdIn(String userId);
+    Optional<List<ChatRoom>> findByUserIdIn(String userId);
 }

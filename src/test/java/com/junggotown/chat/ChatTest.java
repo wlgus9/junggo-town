@@ -8,7 +8,7 @@ import com.junggotown.dto.chat.ChatDto;
 import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
 import com.junggotown.dto.product.ProductDto;
-import com.junggotown.global.commonEnum.ResponseMessage;
+import com.junggotown.global.common.ResponseMessage;
 import com.junggotown.service.ChatService;
 import com.junggotown.service.MemberService;
 import com.junggotown.service.ProductService;

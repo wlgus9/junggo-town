@@ -3,7 +3,7 @@ package com.junggotown.member;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
-import com.junggotown.global.exception.member.MemberException;
+import com.junggotown.global.exception.CustomException;
 import com.junggotown.service.MemberService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class MemberTest {
 
     @Test
     void 회원가입_실패() {
-        assertThrows(MemberException.class, () -> {
+        assertThrows(CustomException.class, () -> {
             MemberDto memberDto1 = MemberDto.getMemberDto("테스트ID", passwordEncoder.encode("테스트PW"), "테스트", "010-1234-5678");
             memberService.join(memberDto1);
 
@@ -57,7 +57,7 @@ public class MemberTest {
 
     @Test
     void 로그인_실패() {
-        assertThrows(MemberException.class, () -> {
+        assertThrows(CustomException.class, () -> {
             MemberDto memberDto = MemberDto.getMemberDto("테스트ID", passwordEncoder.encode("테스트PW"), "테스트", "010-1234-5678");
             memberService.join(memberDto);
 

@@ -4,10 +4,10 @@ import com.junggotown.domain.Product;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.dto.product.ResponseProductDto;
-import com.junggotown.global.exception.product.ProductException;
+import com.junggotown.global.common.ProductStatus;
+import com.junggotown.global.common.ResponseMessage;
+import com.junggotown.global.exception.CustomException;
 import com.junggotown.global.jwt.JwtProvider;
-import com.junggotown.global.commonEnum.ProductStatus;
-import com.junggotown.global.commonEnum.ResponseMessage;
 import com.junggotown.repository.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,7 +27,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final JwtProvider jwtProvider;
 
-    public ApiResponseDto<ResponseProductDto> create(ProductDto productDto, HttpServletRequest request) throws ProductException {
+    @Transactional
+    public ApiResponseDto<ResponseProductDto> create(ProductDto productDto, HttpServletRequest request) {
         Product product = getEntity(productDto, request);
         Long id = productRepository.save(product).getId();
 
@@ -36,32 +36,28 @@ public class ProductService {
     }
 
     // 가상계좌 발급에 필요한 상품 정보 조회
-    public Product getProductInfo(Long productId, HttpServletRequest request) throws ProductException {
+    public Product getProductInfo(Long productId, HttpServletRequest request) {
         Product product = getEntity(ProductDto.getSearchDto(productId), request);
 
-        Product result = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
-
-        return Optional.ofNullable(result)
-                .orElseThrow(() -> new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage()));
+        return productRepository.findByIdAndUserId(product.getId(), product.getUserId())
+                .orElseThrow(() -> new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS));
     }
 
-    public ApiResponseDto<ResponseProductDto> searchByProductId(ProductDto productDto, HttpServletRequest request) throws ProductException {
+    public ApiResponseDto<ResponseProductDto> searchByProductId(ProductDto productDto, HttpServletRequest request) {
         Product product = getEntity(productDto, request);
 
-        Product result = productRepository.findByIdAndUserId(product.getId(), product.getUserId());
-
-        if(result != null) {
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_SEARCH_SUCCESS, ResponseProductDto.getSearchDto(result));
-        } else {
-            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
-        }
+        return productRepository.findByIdAndUserId(product.getId(), product.getUserId())
+                .map(products -> ApiResponseDto.response(
+                        ResponseMessage.PRODUCT_SEARCH_SUCCESS
+                        , ResponseProductDto.getSearchDto(products))
+                )
+                .orElseThrow(() -> new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS));
     }
 
-    public ApiResponseDto<List<ResponseProductDto>> searchByUserId(ProductDto productDto) throws ProductException {
+    public ApiResponseDto<List<ResponseProductDto>> searchByUserId(ProductDto productDto) {
         Product product = Product.getProductFromDto(productDto);
-        Optional<List<Product>> productList = productRepository.findByUserId(product.getUserId());
 
-        return productList
+        return productRepository.findByUserId(product.getUserId())
                 .filter(products -> !products.isEmpty())
                 .map(products -> {
                     List<ResponseProductDto> returnDto = products.stream()
@@ -72,47 +68,55 @@ public class ProductService {
                 .orElseGet(() -> ApiResponseDto.response(ResponseMessage.PRODUCT_IS_EMPTY));
     }
 
-    public ApiResponseDto<ResponseProductDto> update(ProductDto productDto, HttpServletRequest request) throws ProductException {
+    @Transactional
+    public ApiResponseDto<ResponseProductDto> update(ProductDto productDto, HttpServletRequest request) {
         Product product = getEntity(productDto, request);
 
-        if(productIsMine(product)) {
-            Optional<Product> result = productRepository.findById(productRepository.save(product).getId());
-            return ApiResponseDto.response(ResponseMessage.PRODUCT_UPDATE_SUCCESS, ResponseProductDto.getSearchDto(result.get()));
+        if(isMyProduct(product)) {
+            return productRepository.findById(productRepository.save(product).getId())
+                            .map(products -> ApiResponseDto.response(
+                                    ResponseMessage.PRODUCT_UPDATE_SUCCESS
+                                    , ResponseProductDto.getSearchDto(products))
+                            )
+                            .orElseThrow(() -> new CustomException(ResponseMessage.PRODUCT_UPDATE_FAIL));
         } else {
-            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
+            throw new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS);
         }
     }
 
+    @Transactional
     public ApiResponseDto<ResponseProductDto> saleStop(ProductDto productDto, HttpServletRequest request) {
         Product product = getEntity(productDto, request);
 
-        if(productIsMine(product)) {
+        if(isMyProduct(product)) {
             product.changeStatus(ProductStatus.SALE_STOP);
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SALESTOP_SUCCESS);
         } else {
-            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
+            throw new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS);
         }
     }
 
+    @Transactional
     public ApiResponseDto<ResponseProductDto> soldOut(ProductDto productDto, HttpServletRequest request) {
         Product product = getEntity(productDto, request);
 
-        if(productIsMine(product)) {
+        if(isMyProduct(product)) {
             product.changeStatus(ProductStatus.SOLD_OUT);
             return ApiResponseDto.response(ResponseMessage.PRODUCT_SOLDOUT_SUCCESS);
         } else {
-            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
+            throw new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS);
         }
     }
 
-    public ApiResponseDto<ResponseProductDto> delete(ProductDto productDto, HttpServletRequest request) throws ProductException {
+    @Transactional
+    public ApiResponseDto<ResponseProductDto> delete(ProductDto productDto, HttpServletRequest request) {
         Product product = getEntity(productDto, request);
 
-        if(productIsMine(product)) {
+        if(isMyProduct(product)) {
             productRepository.deleteById(product.getId());
             return ApiResponseDto.response(ResponseMessage.PRODUCT_DELETE_SUCCESS);
         } else {
-            throw new ProductException(ResponseMessage.PRODUCT_IS_NOT_YOURS.getMessage());
+            throw new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS);
         }
     }
 
@@ -120,7 +124,7 @@ public class ProductService {
         return Product.getProductFromDto(productDto, jwtProvider.getUserId(request));
     }
 
-    public boolean productIsMine(Product product) {
-        return productRepository.findByIdAndUserId(product.getId(), product.getUserId()) != null;
+    public boolean isMyProduct(Product product) {
+        return productRepository.findByIdAndUserId(product.getId(), product.getUserId()).isPresent();
     }
 }

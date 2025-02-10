@@ -1,14 +1,14 @@
-package com.junggotown.global.commonEnum;
+package com.junggotown.global.common;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PaymentStatus {
-    WAIT(1, "결제대기"),
-    DEPOSIT(2, "입금완료"),
-    CANCEL(3, "결제취소");
+public enum ProductStatus {
+    ON_SALE(1, "판매중"),
+    SALE_STOP(2, "판매중지"),
+    SOLD_OUT(3, "판매완료");
 
     private final int code;
     private final String description;

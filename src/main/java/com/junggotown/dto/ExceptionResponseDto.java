@@ -1,6 +1,6 @@
 package com.junggotown.dto;
 
-import com.junggotown.global.commonEnum.ResponseMessage;
+import com.junggotown.global.common.ResponseMessage;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,10 @@ public class ExceptionResponseDto {
     public ExceptionResponseDto(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
+    }
+
+    public static ResponseEntity<ExceptionResponseDto> toResponseEntity(HttpStatus httpStatus) {
+        return toResponseEntity(httpStatus, null);
     }
 
     public static ResponseEntity<ExceptionResponseDto> toResponseEntity(HttpStatus httpStatus, String message) {
