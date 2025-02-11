@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS member;
 CREATE TABLE member (
     id BIGINT NOT NULL AUTO_INCREMENT,
     user_id VARCHAR(50) NOT NULL COMMENT '사용자 아이디',
@@ -10,6 +11,7 @@ CREATE TABLE member (
     UNIQUE (user_id)
 );
 
+DROP TABLE IF EXISTS product;
 CREATE TABLE product (
     id BIGINT NOT NULL AUTO_INCREMENT,
     user_id VARCHAR(50) NOT NULL COMMENT '등록자 아이디',
@@ -22,6 +24,7 @@ CREATE TABLE product (
     PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS chat_room;
 CREATE TABLE chat_room (
     chat_room_id CHAR(36) PRIMARY KEY COMMENT '채팅방 아이디(UUID)',
     product_id BIGINT NOT NULL COMMENT '상품 아이디',
@@ -31,6 +34,7 @@ CREATE TABLE chat_room (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'
 );
 
+DROP TABLE IF EXISTS chat;
 CREATE TABLE chat (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '채팅 ID',
     chat_room_id CHAR(36) NOT NULL COMMENT '채팅방 아이디',

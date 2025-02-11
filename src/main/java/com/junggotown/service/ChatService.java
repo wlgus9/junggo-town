@@ -67,6 +67,7 @@ public class ChatService {
 
         // 사용자가 포함된 모든 채팅방 조회
         List<ChatRoom> chatRooms = chatRoomRepository.findByUserIdIn(userId)
+                .filter(chatRoomList -> !chatRoomList.isEmpty())
                 .orElseThrow(() -> new CustomException(ResponseMessage.CHAT_IS_EMPTY));
 
         // 채팅방 ID 리스트 추출
@@ -76,6 +77,7 @@ public class ChatService {
 
         // 해당 채팅방들에 속한 채팅 메시지 조회
         List<Chat> chatList = chatRepository.findByChatRoom_ChatRoomIdIn(chatRoomIds)
+                .filter(chats -> !chats.isEmpty())
                 .orElseThrow(() -> new CustomException(ResponseMessage.CHAT_IS_EMPTY));
 
         // 채팅방 ID 기준으로 그룹화

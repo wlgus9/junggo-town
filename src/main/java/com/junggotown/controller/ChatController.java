@@ -37,7 +37,7 @@ public class ChatController {
     }
 
     @Operation(summary = "채팅 전체 조회", description = "나의 채팅 내역 전체를 조회합니다.")
-    @GetMapping("/searchall")
+    @GetMapping("/search-all")
     public ApiResponseDto<Map<String, List<ResponseChatDto>>> searchAll(HttpServletRequest request) {
         return chatService.searchAll(request);
     }

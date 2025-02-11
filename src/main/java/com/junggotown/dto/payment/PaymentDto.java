@@ -1,4 +1,4 @@
-package com.junggotown.dto.product;
+package com.junggotown.dto.payment;
 
 import com.junggotown.domain.Payment;
 import lombok.Builder;

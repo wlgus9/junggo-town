@@ -1,7 +1,6 @@
 package com.junggotown.chat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junggotown.TestUtil;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.chat.ChatDto;
@@ -9,9 +8,7 @@ import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.global.common.ResponseMessage;
-import com.junggotown.service.ChatService;
 import com.junggotown.service.MemberService;
-import com.junggotown.service.ProductService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,11 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ChatTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private ChatService chatService;
-    @Autowired private ProductService productService;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
     @Autowired private MemberService memberService;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     private String registUserId1;
     private String registUserToken1;
@@ -53,7 +49,7 @@ public class ChatTest {
     private final String CREATE_URL = "/api/v1/products/create";
     private final String SEND_URL = "/api/v1/chat/send";
     private final String SEARCH_URL = "/api/v1/chat/search?productId=";
-    private final String SEARCH_ALL_URL = "/api/v1/chat/searchall";
+    private final String SEARCH_ALL_URL = "/api/v1/chat/search-all";
 
     @BeforeEach
     void 로그인() {
@@ -78,25 +74,15 @@ public class ChatTest {
         consumerUserToken = apiResponseDto3.getData().getToken();
     }
 
-    @Test
-    void 상품_등록_성공() throws Exception {
-        ProductDto productDto1 = ProductDto.getCreateDto("testName1", "testDesc1", BigDecimal.valueOf(10000));
-        ProductDto productDto2 = ProductDto.getCreateDto("testName2", "testDesc2", BigDecimal.valueOf(20000));
-        ProductDto productDto3 = ProductDto.getCreateDto("testName3", "testDesc3", BigDecimal.valueOf(30000));
-
-        JsonNode response1 = TestUtil.performPostRequestAndGetResponse(mockMvc, CREATE_URL, registUserId1, registUserToken1, productDto1, HttpStatus.OK);
-        assertThat(response1.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_CREATE_SUCCESS.getMessage());
-
-        JsonNode response2 = TestUtil.performPostRequestAndGetResponse(mockMvc, CREATE_URL, registUserId1, registUserToken1, productDto2, HttpStatus.OK);
-        assertThat(response2.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_CREATE_SUCCESS.getMessage());
-
-        JsonNode response3 = TestUtil.performPostRequestAndGetResponse(mockMvc, CREATE_URL, registUserId2, registUserToken2, productDto3, HttpStatus.OK);
-        assertThat(response3.get("message").asText()).isEqualTo(ResponseMessage.PRODUCT_CREATE_SUCCESS.getMessage());
+    @BeforeEach
+    void autoIncrementReset() {
+        jdbcTemplate.execute("ALTER TABLE product ALTER COLUMN id RESTART WITH 1;");
+        jdbcTemplate.execute("ALTER TABLE chat ALTER COLUMN id RESTART WITH 1;");
     }
 
     @Test
     void 채팅_전송_성공() throws Exception {
-        상품_등록_성공();
+        saveProduct();
 
         ChatDto chatDto1_1 = ChatDto.getCreateDto(1L, consumerUserId, registUserId1, "상품 아직 있나요?");
         ChatDto chatDto1_2 = ChatDto.getCreateDto(1L, registUserId1, consumerUserId, "네 있어요.");
@@ -125,7 +111,7 @@ public class ChatTest {
 
     @Test
     void 채팅_조회_성공() throws Exception {
-        채팅_전송_성공();
+        saveChat();
 
         JsonNode response = TestUtil.performGetRequestAndGetResponse(mockMvc, SEARCH_URL+"1", consumerUserId, consumerUserToken, HttpStatus.OK);
         assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.CHAT_SEARCH_SUCCESS.getMessage());
@@ -133,7 +119,7 @@ public class ChatTest {
 
     @Test
     void 채팅_조회_실패() throws Exception {
-        채팅_전송_성공();
+        saveChat();
 
         JsonNode response = TestUtil.performGetRequestAndGetResponse(mockMvc, SEARCH_URL+"4", consumerUserId, consumerUserToken, HttpStatus.OK);
         assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.CHAT_IS_EMPTY.getMessage());
@@ -141,7 +127,7 @@ public class ChatTest {
 
     @Test
     void 채팅_전체_조회_성공() throws Exception{
-        채팅_전송_성공();
+        saveChat();
 
         JsonNode response = TestUtil.performGetRequestAndGetResponse(mockMvc, SEARCH_ALL_URL, consumerUserId, consumerUserToken, HttpStatus.OK);
         assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.CHAT_SEARCH_SUCCESS.getMessage());
@@ -151,5 +137,35 @@ public class ChatTest {
     void 채팅_전체_조회_실패() throws Exception{
         JsonNode response = TestUtil.performGetRequestAndGetResponse(mockMvc, SEARCH_ALL_URL, consumerUserId, consumerUserToken, HttpStatus.OK);
         assertThat(response.get("message").asText()).isEqualTo(ResponseMessage.CHAT_IS_EMPTY.getMessage());
+    }
+
+    void saveProduct() throws Exception {
+        ProductDto productDto1 = ProductDto.getCreateDto("testName1", "testDesc1", BigDecimal.valueOf(10000));
+        ProductDto productDto2 = ProductDto.getCreateDto("testName2", "testDesc2", BigDecimal.valueOf(20000));
+        ProductDto productDto3 = ProductDto.getCreateDto("testName3", "testDesc3", BigDecimal.valueOf(30000));
+
+        TestUtil.performPostRequestAndGetResponse(mockMvc, CREATE_URL, registUserId1, registUserToken1, productDto1, HttpStatus.OK);
+        TestUtil.performPostRequestAndGetResponse(mockMvc, CREATE_URL, registUserId1, registUserToken1, productDto2, HttpStatus.OK);
+        TestUtil.performPostRequestAndGetResponse(mockMvc, CREATE_URL, registUserId2, registUserToken2, productDto3, HttpStatus.OK);
+    }
+
+    void saveChat() throws Exception {
+        saveProduct();
+
+        ChatDto chatDto1_1 = ChatDto.getCreateDto(1L, consumerUserId, registUserId1, "상품 아직 있나요?");
+        ChatDto chatDto1_2 = ChatDto.getCreateDto(1L, registUserId1, consumerUserId, "네 있어요.");
+        ChatDto chatDto1_3 = ChatDto.getCreateDto(1L, consumerUserId, registUserId1, "구매하고 싶어요.");
+
+        ChatDto chatDto2_1 = ChatDto.getCreateDto(3L, consumerUserId, registUserId2, "안녕하세요 구매하고 싶어요.");
+        ChatDto chatDto2_2 = ChatDto.getCreateDto(3L, registUserId2, consumerUserId, "죄송해요 팔렸어요.");
+        ChatDto chatDto2_3 = ChatDto.getCreateDto(3L, consumerUserId, registUserId2, "네 ㅠㅠ");
+
+        TestUtil.performPostRequestAndGetResponse(mockMvc, SEND_URL, consumerUserId, consumerUserToken, chatDto1_1, HttpStatus.OK);
+        TestUtil.performPostRequestAndGetResponse(mockMvc, SEND_URL, registUserId1, registUserToken1, chatDto1_2, HttpStatus.OK);
+        TestUtil.performPostRequestAndGetResponse(mockMvc, SEND_URL, consumerUserId, consumerUserToken, chatDto1_3, HttpStatus.OK);
+
+        TestUtil.performPostRequestAndGetResponse(mockMvc, SEND_URL, consumerUserId, consumerUserToken, chatDto2_1, HttpStatus.OK);
+        TestUtil.performPostRequestAndGetResponse(mockMvc, SEND_URL, registUserId2, registUserToken2, chatDto2_2, HttpStatus.OK);
+        TestUtil.performPostRequestAndGetResponse(mockMvc, SEND_URL, consumerUserId, consumerUserToken, chatDto2_3, HttpStatus.OK);
     }
 }

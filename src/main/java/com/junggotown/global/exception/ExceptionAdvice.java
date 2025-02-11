@@ -13,7 +13,6 @@ public class ExceptionAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponseDto> exception(Exception e) {
-        log.error("Cause : {}", e.getCause().toString());
         log.error("{} : {}", e.getClass().getName(), e.getMessage());
 
         if(e instanceof CustomException) {
