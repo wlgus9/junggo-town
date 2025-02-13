@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -71,7 +72,7 @@ public class ChatService {
                 .orElseThrow(() -> new CustomException(ResponseMessage.CHAT_IS_EMPTY));
 
         // 채팅방 ID 리스트 추출
-        List<String> chatRoomIds = chatRooms.stream()
+        List<UUID> chatRoomIds = chatRooms.stream()
                 .map(ChatRoom::getChatRoomId)
                 .collect(Collectors.toList());
 

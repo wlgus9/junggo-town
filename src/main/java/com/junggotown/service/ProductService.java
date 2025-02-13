@@ -36,10 +36,8 @@ public class ProductService {
     }
 
     // 가상계좌 발급에 필요한 상품 정보 조회
-    public Product getProductInfo(Long productId, HttpServletRequest request) {
-        Product product = getEntity(ProductDto.getSearchDto(productId), request);
-
-        return productRepository.findByIdAndUserId(product.getId(), product.getUserId())
+    public Product getProduct(Long productId, String userId) {
+        return productRepository.findByIdAndUserId(productId, userId)
                 .orElseThrow(() -> new CustomException(ResponseMessage.PRODUCT_IS_NOT_YOURS));
     }
 

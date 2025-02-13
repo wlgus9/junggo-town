@@ -46,3 +46,37 @@ CREATE TABLE chat (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
     CONSTRAINT fk_chat_chatroom FOREIGN KEY (chat_room_id) REFERENCES chat_room (chat_room_id) ON DELETE CASCADE
 );
+
+CREATE TABLE orders (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    payment_id CHAR(36) NOT NULL UNIQUE COMMENT '주문 ID',
+    product_id BIGINT NOT NULL COMMENT '상품 정보',
+    buyer_id VARCHAR(50) NOT NULL COMMENT '구매자 정보',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'
+);
+
+CREATE TABLE payment (
+    id UUID PRIMARY KEY COMMENT '결제 ID (UUID)',
+    m_id VARCHAR(255) NOT NULL COMMENT '가맹점 ID',
+    payment_key VARCHAR(255) NOT NULL COMMENT '결제 고유 키',
+    order_id VARCHAR(255) NOT NULL COMMENT '주문 ID',
+    order_name VARCHAR(255) NOT NULL COMMENT '구매상품명',
+    status VARCHAR(50) NOT NULL COMMENT '결제 처리 상태',
+    requested_at TIMESTAMP NOT NULL COMMENT '결제 요청 일시',
+    approved_at TIMESTAMP DEFAULT NULL COMMENT '결제 승인 일시',
+    total_amount INT NOT NULL COMMENT '총 결제 금액',
+    account_number VARCHAR(50) NOT NULL COMMENT '가상계좌번호',
+    bank_code VARCHAR(10) NOT NULL COMMENT '은행 코드',
+    customer_name VARCHAR(255) NOT NULL COMMENT '예금주명',
+    due_date TIMESTAMP NOT NULL COMMENT '입금 만료 일시',
+    expired BOOLEAN NOT NULL COMMENT '입금 만료 여부',
+    settlement_status VARCHAR(50) NOT NULL COMMENT '결제 상태',
+    refund_status VARCHAR(50) NOT NULL COMMENT '환불 처리 상태',
+    refund_bank_code VARCHAR(10) DEFAULT NULL COMMENT '환불 은행 코드',
+    refund_account_number VARCHAR(50) DEFAULT NULL COMMENT '환불 계좌번호',
+    refund_holder_name VARCHAR(255) DEFAULT NULL COMMENT '환불 예금주명',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'
+);
+

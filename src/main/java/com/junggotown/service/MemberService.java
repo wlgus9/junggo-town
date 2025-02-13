@@ -50,4 +50,10 @@ public class MemberService {
             throw new CustomException(ResponseMessage.LOGIN_FAIL);
         }
     }
+
+    // 가상계좌 발급에 필요한 회원 정보 조회
+    public Member getMember(String userId) {
+        return memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ResponseMessage.MEMBER_IS_NOT_EXISTS));
+    }
 }

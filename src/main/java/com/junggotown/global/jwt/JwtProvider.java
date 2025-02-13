@@ -55,7 +55,7 @@ public class JwtProvider {
         String existingToken = tokenCache.get(userId);
 
         // 기존 토큰이 유효하면 재사용
-        if (existingToken != null && !validateToken(existingToken)) {
+        if (existingToken != null && validateToken(existingToken)) {
             return existingToken;
         }
 

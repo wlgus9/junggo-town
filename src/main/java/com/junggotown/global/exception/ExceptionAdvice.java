@@ -16,13 +16,13 @@ public class ExceptionAdvice {
         log.error("{} : {}", e.getClass().getName(), e.getMessage());
 
         if(e instanceof CustomException) {
-            return ExceptionResponseDto.toResponseEntity(((CustomException) e).getResponseMessage());
+            return ExceptionResponseDto.toResponseEntity(((CustomException) e).getCode(), e.getMessage());
         }
 
         if(e instanceof IllegalArgumentException) {
-            return ExceptionResponseDto.toResponseEntity(HttpStatus.BAD_REQUEST);
+            return ExceptionResponseDto.toResponseEntity(HttpStatus.BAD_REQUEST.value(), "잘못된 파라미터");
         }
 
-        return ExceptionResponseDto.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        return ExceptionResponseDto.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR.value(), "알 수 없는 오류");
     }
 }

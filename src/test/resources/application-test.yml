@@ -18,3 +18,8 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+
+toss:
+  virtual-account-url: https://api.tosspayments.com/v1/virtual-accounts
+  secret: dGVzdF9za19CYTVQelIwQXJueUdRRU5la3lia1Z2bVluTmVEOgo=
+

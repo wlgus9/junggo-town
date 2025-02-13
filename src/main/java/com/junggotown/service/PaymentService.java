@@ -1,59 +1,83 @@
 package com.junggotown.service;
 
+import com.junggotown.domain.Member;
+import com.junggotown.domain.Orders;
+import com.junggotown.domain.Payment;
 import com.junggotown.domain.Product;
+import com.junggotown.dto.ApiResponseDto;
+import com.junggotown.dto.payment.PaymentDto;
+import com.junggotown.dto.payment.ResponsePaymentDto;
+import com.junggotown.dto.payment.ResponseVirtualAccountDto;
+import com.junggotown.global.common.ResponseMessage;
+import com.junggotown.global.exception.CustomException;
+import com.junggotown.global.jwt.JwtProvider;
+import com.junggotown.repository.OrdersRepository;
+import com.junggotown.repository.PaymentRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final OrdersRepository ordersRepository;
+    private final PaymentRepository paymentRepository;
     private final ProductService productService;
+    private final MemberService memberService;
+    private final JwtProvider jwtProvider;
 
     @Value("${toss.virtual-account-url}")
     private String VIRTUAL_ACCOUNT_URL;
     @Value("${toss.secret}")
     private String TOSS_SECRET_KEY;
 
-    // 가상계좌 발급 로직
-    public void getVirtualAccount(Long productId, HttpServletRequest request) {
-        RestTemplate restTemplate = new RestTemplate();
+    private static final String BANK = "20";
+    private static final int VALID_HOURS = 1;
 
-        // 요청 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Basic " + TOSS_SECRET_KEY);
+    public ApiResponseDto<ResponsePaymentDto> createVirtualAccount(Long productId, HttpServletRequest request) {
+        String userId = jwtProvider.getUserId(request);
 
-        // 요청 바디 데이터
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("amount", 500000);
-        requestBody.put("orderId", "order_2345");
-        requestBody.put("orderName", "아이폰 15프로");
-        requestBody.put("customerName", "홍길동");
-        requestBody.put("bank", "토스"); // 가상계좌 발급 은행
-        requestBody.put("validHours", 1); // 가상계좌 유효 시간(기본값:168(7일))
+        Product product = productService.getProduct(productId, userId);
+        Member member = memberService.getMember(userId); // 회원 정보 조회
 
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseVirtualAccountDto responseVirtualAccountDto = requestVirtualAccount(PaymentDto.createPaymentDto(product, member)); // 가상계좌 발급
 
-        // POST 요청 보내기
-        ResponseEntity<String> response = restTemplate.exchange(VIRTUAL_ACCOUNT_URL, HttpMethod.POST, requestEntity, String.class);
+        Payment payment = Payment.getPaymentFromDto(responseVirtualAccountDto); // Payment Entity 생성
+        String paymentId = paymentRepository.save(payment).getId().toString();
 
-        // 응답 출력
-        log.info("Response: {}", response.getBody());
+        Orders orders = Orders.getOrders(paymentId, productId, userId); // Orders Entity 생성
+        ordersRepository.save(orders);
+
+        return ApiResponseDto.response(ResponseMessage.VIRTUAL_ACCOUNT_CREATE_SUCCESS, ResponsePaymentDto.getCreateDto(orders, payment));
     }
 
-    public Product getProductInfo(Long productId, HttpServletRequest request) {
-        // 상품 정보 조회 로직
-        return productService.getProductInfo(productId, request);
-    }
+    // 가상계좌 발급 요청
+    public ResponseVirtualAccountDto requestVirtualAccount(PaymentDto paymentDto) {
+        RestClient restClient = RestClient.builder()
+                .baseUrl(VIRTUAL_ACCOUNT_URL)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY+"11")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
 
+        return restClient.post()
+                .body(paymentDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (request, response) -> {
+                    throw new CustomException(
+                            response.getStatusCode().value()
+                            , new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)
+                    );
+                })
+                .body(ResponseVirtualAccountDto.class);
+    }
 }

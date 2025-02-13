@@ -7,10 +7,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("SELECT c FROM Chat c WHERE c.productId = :productId AND (c.sendUserId = :userId OR c.receiveUserId = :userId) ORDER BY c.createdAt ASC")
     Optional<List<Chat>> findByProductIdAndUserId(@Param("productId")Long productId, @Param("userId") String userId);
 
-    Optional<List<Chat>> findByChatRoom_ChatRoomIdIn(List<String> chatRoomIds);
+    Optional<List<Chat>> findByChatRoom_ChatRoomIdIn(List<UUID> chatRoomIds);
 }
