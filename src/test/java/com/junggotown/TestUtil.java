@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -38,7 +37,7 @@ public class TestUtil {
     }
 
     // Missing Token 요청 메서드
-    public static JsonNode performMissingTokenRequesetAndGetResponse(MockMvc mockMvc, String url, String userId, Object requestBody, HttpStatus expectedStatus) throws Exception {
+    public static JsonNode performMissingTokenRequestAndGetResponse(MockMvc mockMvc, String url, String userId, Object requestBody, HttpStatus expectedStatus) throws Exception {
         return performRequestAndGetResponse(mockMvc, post(url), userId, null, requestBody, expectedStatus);
     }
 
@@ -51,16 +50,13 @@ public class TestUtil {
                                                          HttpStatus expectedStatus) throws Exception {
         if (requestBody != null) {
             requestBuilder.contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestBody));
+                    .content(objectMapper.writeValueAsString(requestBody))
+                    .header("userId", userId);
         }
 
         if(token != null) {
-            RequestBuilder tokenBuilder = requestBuilder
-                    .header("userId", userId)
+            requestBuilder
                     .header("Authorization", "Bearer " + token);
-        } else {
-            RequestBuilder tokenBuilder = requestBuilder
-                    .header("userId", userId);
         }
 
         ResultActions resultActions = mockMvc.perform(requestBuilder)

@@ -33,15 +33,6 @@ public class Chat extends BaseEntity {
         this.message = message;
     }
 
-    public static Chat getChatFromDto(ChatDto chatDto) {
-        return Chat.builder()
-                .productId(chatDto.getProductId())
-                .sendUserId(chatDto.getSendUserId())
-                .receiveUserId(chatDto.getReceiveUserId())
-                .message(chatDto.getMessage())
-                .build();
-    }
-
     public static Chat getChatFromDto(ChatDto chatDto, ChatRoom chatRoom) {
         return Chat.builder()
                 .chatRoom(chatRoom)
@@ -53,6 +44,6 @@ public class Chat extends BaseEntity {
     }
 
     public String getChatRoomId() {
-        return this.chatRoom != null ? this.chatRoom.getChatRoomId() : null;
+        return this.chatRoom != null ? this.chatRoom.getChatRoomId().toString() : null;
     }
 }

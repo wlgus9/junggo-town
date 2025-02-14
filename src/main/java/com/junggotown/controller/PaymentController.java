@@ -1,7 +1,7 @@
 package com.junggotown.controller;
 
 import com.junggotown.dto.ApiResponseDto;
-import com.junggotown.dto.chat.ResponseChatDto;
+import com.junggotown.dto.payment.ResponsePaymentDto;
 import com.junggotown.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,9 +23,8 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @Operation(summary = "가상계좌 발급", description = "상품 아이디를 입력하여 가상계좌를 발급합니다.")
-    @GetMapping("/virtual-account")
-    public ApiResponseDto<ResponseChatDto> getVirtualAccount(@RequestParam("productId") Long productId, HttpServletRequest request) {
-        paymentService.getVirtualAccount(productId, request);
-        return null;
+    @GetMapping("/virtual-account/create")
+    public ApiResponseDto<ResponsePaymentDto> createVirtualAccount(@RequestParam("productId") Long productId, HttpServletRequest request) {
+        return paymentService.createVirtualAccount(productId, request);
     }
 }

@@ -1,6 +1,6 @@
 package com.junggotown.dto;
 
-import com.junggotown.global.commonEnum.ResponseMessage;
+import com.junggotown.global.common.ResponseMessage;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -8,27 +8,31 @@ import org.springframework.http.ResponseEntity;
 
 @Getter
 public class ExceptionResponseDto {
-    private HttpStatus httpStatus;
+    private int code;
     private String message;
 
     @Builder
-    public ExceptionResponseDto(HttpStatus httpStatus, String message) {
-        this.httpStatus = httpStatus;
+    public ExceptionResponseDto(int code, String message) {
+        this.code = code;
         this.message = message;
     }
 
-    public static ResponseEntity<ExceptionResponseDto> toResponseEntity(HttpStatus httpStatus, String message) {
+    public static ResponseEntity<ExceptionResponseDto> toResponseEntity(HttpStatus httpStatus) {
+        return toResponseEntity(httpStatus.value(), null);
+    }
+
+    public static ResponseEntity<ExceptionResponseDto> toResponseEntity(int code, String message) {
         ExceptionResponseDto response = ExceptionResponseDto.builder()
-                .httpStatus(httpStatus)
+                .code(code)
                 .message(message)
                 .build();
 
-        return ResponseEntity.status(httpStatus).body(response);
+        return ResponseEntity.status(code).body(response);
     }
 
     public static ResponseEntity<ExceptionResponseDto> toResponseEntity(ResponseMessage responseMessage) {
         ExceptionResponseDto response = ExceptionResponseDto.builder()
-                .httpStatus(responseMessage.getHttpStatus())
+                .code(responseMessage.getHttpStatus().value())
                 .message(responseMessage.getMessage())
                 .build();
 
