@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -53,7 +54,7 @@ public class PaymentService {
         ResponseVirtualAccountDto responseVirtualAccountDto = requestVirtualAccount(PaymentDto.createPaymentDto(product, member)); // 가상계좌 발급
 
         Payment payment = Payment.getPaymentFromDto(responseVirtualAccountDto); // Payment Entity 생성
-        String paymentId = paymentRepository.save(payment).getId().toString();
+        UUID paymentId = paymentRepository.save(payment).getId();
 
         Orders orders = Orders.getOrders(paymentId, productId, userId); // Orders Entity 생성
         ordersRepository.save(orders);
@@ -65,7 +66,7 @@ public class PaymentService {
     public ResponseVirtualAccountDto requestVirtualAccount(PaymentDto paymentDto) {
         RestClient restClient = RestClient.builder()
                 .baseUrl(VIRTUAL_ACCOUNT_URL)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY+"11")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 

@@ -79,7 +79,7 @@ public class PaymentTest {
     }
 
     @Test
-    void API요청() {
+    void 가상계좌발급_API요청() {
         RestClient restClient = RestClient.builder()
                 .baseUrl(VIRTUAL_ACCOUNT_URL)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)

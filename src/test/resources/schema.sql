@@ -26,7 +26,7 @@ CREATE TABLE product (
 
 DROP TABLE IF EXISTS chat_room;
 CREATE TABLE chat_room (
-    chat_room_id CHAR(36) PRIMARY KEY COMMENT '채팅방 아이디(UUID)',
+    chat_room_id UUID PRIMARY KEY COMMENT '채팅방 아이디(UUID)',
     product_id BIGINT NOT NULL COMMENT '상품 아이디',
     buyer_id VARCHAR(50) NOT NULL COMMENT '구매자 아이디',
     seller_id VARCHAR(50) NOT NULL COMMENT '판매자 아이디',
@@ -37,7 +37,7 @@ CREATE TABLE chat_room (
 DROP TABLE IF EXISTS chat;
 CREATE TABLE chat (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '채팅 ID',
-    chat_room_id CHAR(36) NOT NULL COMMENT '채팅방 아이디',
+    chat_room_id UUID NOT NULL COMMENT '채팅방 아이디',
     product_id BIGINT NOT NULL COMMENT '상품 아이디',
     send_user_id VARCHAR(50) NOT NULL COMMENT '발신자 아이디',
     receive_user_id VARCHAR(50) NOT NULL COMMENT '수신자 아이디',
@@ -49,7 +49,7 @@ CREATE TABLE chat (
 
 CREATE TABLE orders (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    payment_id CHAR(36) NOT NULL UNIQUE COMMENT '주문 ID',
+    payment_id UUID NOT NULL UNIQUE COMMENT '주문 ID',
     product_id BIGINT NOT NULL COMMENT '상품 정보',
     buyer_id VARCHAR(50) NOT NULL COMMENT '구매자 정보',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
