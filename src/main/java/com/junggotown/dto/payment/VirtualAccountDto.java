@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-public class PaymentDto {
+public class VirtualAccountDto {
     private BigDecimal amount;
     private String orderId = generateOrderId();
     private String orderName;
@@ -22,14 +22,14 @@ public class PaymentDto {
     private int validHours = 1;
 
     @Builder
-    public PaymentDto(BigDecimal amount, String orderName, String customerName) {
+    public VirtualAccountDto(BigDecimal amount, String orderName, String customerName) {
         this.amount = amount;
         this.orderName = orderName;
         this.customerName = customerName;
     }
 
-    public static PaymentDto createPaymentDto(Product product, Member member) {
-        return PaymentDto.builder()
+    public static VirtualAccountDto createVirtualAccountDto(Product product, Member member) {
+        return VirtualAccountDto.builder()
                 .amount(product.getPrice())
                 .orderName(product.getProductName())
                 .customerName(member.getUserName())

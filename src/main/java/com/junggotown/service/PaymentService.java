@@ -5,7 +5,7 @@ import com.junggotown.domain.Orders;
 import com.junggotown.domain.Payment;
 import com.junggotown.domain.Product;
 import com.junggotown.dto.ApiResponseDto;
-import com.junggotown.dto.payment.PaymentDto;
+import com.junggotown.dto.payment.VirtualAccountDto;
 import com.junggotown.dto.payment.ResponsePaymentDto;
 import com.junggotown.dto.payment.ResponseVirtualAccountDto;
 import com.junggotown.global.common.ResponseMessage;
@@ -42,16 +42,13 @@ public class PaymentService {
     @Value("${toss.secret}")
     private String TOSS_SECRET_KEY;
 
-    private static final String BANK = "20";
-    private static final int VALID_HOURS = 1;
-
     public ApiResponseDto<ResponsePaymentDto> createVirtualAccount(Long productId, HttpServletRequest request) {
         String userId = jwtProvider.getUserId(request);
 
         Product product = productService.getProduct(productId, userId);
         Member member = memberService.getMember(userId); // 회원 정보 조회
 
-        ResponseVirtualAccountDto responseVirtualAccountDto = requestVirtualAccount(PaymentDto.createPaymentDto(product, member)); // 가상계좌 발급
+        ResponseVirtualAccountDto responseVirtualAccountDto = requestVirtualAccount(VirtualAccountDto.createVirtualAccountDto(product, member)); // 가상계좌 발급
 
         Payment payment = Payment.getPaymentFromDto(responseVirtualAccountDto); // Payment Entity 생성
         UUID paymentId = paymentRepository.save(payment).getId();
@@ -63,7 +60,7 @@ public class PaymentService {
     }
 
     // 가상계좌 발급 요청
-    public ResponseVirtualAccountDto requestVirtualAccount(PaymentDto paymentDto) {
+    public ResponseVirtualAccountDto requestVirtualAccount(VirtualAccountDto virtualAccountDto) {
         RestClient restClient = RestClient.builder()
                 .baseUrl(VIRTUAL_ACCOUNT_URL)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)
@@ -71,7 +68,7 @@ public class PaymentService {
                 .build();
 
         return restClient.post()
-                .body(paymentDto)
+                .body(virtualAccountDto)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (request, response) -> {
                     throw new CustomException(
