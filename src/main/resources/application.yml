@@ -46,6 +46,6 @@ jwt:
   secret: zk+5IRIt90hfC7C1KwNVtX9TcjY8HT0/fZvmVrHIY+1ESeWbBfPW7HrNnXf+AtTdWg+LdbP4MBt3ued4ulNcjw==
 
 toss:
-  payment-confirm-url: https://api.tosspayments.com/v1/payments/confirm
+  search-payment-url: https://api.tosspayments.com/v1/payments
   virtual-account-url: https://api.tosspayments.com/v1/virtual-accounts
   secret: dGVzdF9za19CYTVQelIwQXJueUdRRU5la3lia1Z2bVluTmVEOgo=

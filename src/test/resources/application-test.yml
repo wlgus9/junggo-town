@@ -20,7 +20,7 @@ spring:
       ddl-auto: create-drop
 
 toss:
-  payment-confirm-url: https://api.tosspayments.com/v1/payments/confirm
+  search-payment-url: https://api.tosspayments.com/v1/payments
   virtual-account-url: https://api.tosspayments.com/v1/virtual-accounts
   secret: dGVzdF9za19CYTVQelIwQXJueUdRRU5la3lia1Z2bVluTmVEOgo=
 

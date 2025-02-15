@@ -123,4 +123,9 @@ public class Payment extends BaseEntity {
                 .refundStatus(response.getVirtualAccount().getRefundStatus())
                 .build();
     }
+
+    // 결제 상태 변경 메서드
+    public void changeStatus(String newStatus) {
+        this.status = newStatus;
+    }
 }

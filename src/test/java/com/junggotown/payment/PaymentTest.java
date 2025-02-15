@@ -7,9 +7,8 @@ import com.junggotown.domain.Product;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
-import com.junggotown.dto.payment.ConfirmDto;
-import com.junggotown.dto.payment.VirtualAccountDto;
 import com.junggotown.dto.payment.ResponseVirtualAccountDto;
+import com.junggotown.dto.payment.VirtualAccountDto;
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.global.common.ResponseMessage;
 import com.junggotown.service.MemberService;
@@ -52,8 +51,8 @@ public class PaymentTest {
 
     private final String CREATE_URL = "/api/v1/payments/virtual-account/create";
 
-    @Value("${toss.payment-confirm-url}")
-    private String PAYMENT_CONFIRM_URL;
+    @Value("${toss.search-payment-url}")
+    private String SEARCH_PAYMENT_URL;
     @Value("${toss.virtual-account-url}")
     private String VIRTUAL_ACCOUNT_URL;
     @Value("${toss.secret}")
@@ -121,27 +120,20 @@ public class PaymentTest {
     }
 
     @Test
-    void 결제승인_API요청() {
+    void 결제내역조회_API요청() {
         RestClient restClient = RestClient.builder()
-                .baseUrl(PAYMENT_CONFIRM_URL)
+                .baseUrl(SEARCH_PAYMENT_URL + "tviva20250215152329ZgDo6")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        ResponseVirtualAccountDto response = restClient.post()
-                .body(ConfirmDto.builder()
-                                .amount(100000)
-                                .orderId("ORDER-20250215-b803002e")
-                                .paymentKey("tviva20250215113848Rd411")
-                                .build()
-                )
+        ResponseVirtualAccountDto response = restClient.get()
                 .retrieve()
                 .body(ResponseVirtualAccountDto.class);
 
-        log.info("response: {}", response);
-        log.info("response: {}", response.getStatus());
+        log.info("status : {}", response.getStatus());
         log.info("response: {}", response.getOrderId());
-        log.info("response: {}", response.getVirtualAccount().getSettlementStatus());
+        log.info("response: {}", response.getPaymentKey());
         log.info("response: {}", response.getVirtualAccount().getAccountNumber());
         log.info("response: {}", response.getVirtualAccount().getCustomerName());
     }

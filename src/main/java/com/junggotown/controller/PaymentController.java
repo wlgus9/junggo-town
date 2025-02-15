@@ -4,6 +4,7 @@ import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.payment.ResponsePaymentDto;
 import com.junggotown.dto.payment.WebHookDto;
 import com.junggotown.service.PaymentService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,18 +28,17 @@ public class PaymentController {
         return paymentService.createVirtualAccount(productId, request);
     }
 
-    @Operation(summary = "결제승인", description = "가상계좌의 입금한 결제내역을 승인합니다.")
-    @GetMapping("/confirm")
-    public ApiResponseDto<ResponsePaymentDto> confirmPayment(@RequestParam("productId") Long productId, HttpServletRequest request) {
-        return null;
-    }
-
-    @Operation(summary = "웹훅", description = "가상계좌 웹훅의 엔드포인트입니다.")
+    @Operation(summary = "웹훅", description = "가상계좌 웹훅의 엔드포인트입니다. 결제 상태를 업데이트합니다.")
+    @Hidden
     @PostMapping("/hook")
     public HttpStatus webHook(@RequestBody WebHookDto webHookDto) {
-        log.info("getOrderId : {}", webHookDto.getOrderId());
-        log.info("getStatus : {}", webHookDto.getStatus());
-
+        paymentService.updatePaymentStatus(webHookDto);
         return HttpStatus.OK;
+    }
+
+    @Operation(summary = "결제상태 조회", description = "paymentKey를 입력하여 해당 결제의 상태를 조회합니다.")
+    @GetMapping("/status")
+    public ApiResponseDto<String> searchPaymentStatus(@RequestParam("paymentKey") String paymentKey) {
+        return paymentService.searchPaymentStatus(paymentKey);
     }
 }
