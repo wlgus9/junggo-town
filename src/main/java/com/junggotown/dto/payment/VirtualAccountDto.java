@@ -1,6 +1,5 @@
 package com.junggotown.dto.payment;
 
-import com.junggotown.domain.Member;
 import com.junggotown.domain.Product;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,11 +27,11 @@ public class VirtualAccountDto {
         this.customerName = customerName;
     }
 
-    public static VirtualAccountDto createVirtualAccountDto(Product product, Member member) {
+    public static VirtualAccountDto createVirtualAccountDto(Product product, String userName) {
         return VirtualAccountDto.builder()
                 .amount(product.getPrice())
                 .orderName(product.getProductName())
-                .customerName(member.getUserName())
+                .customerName(userName)
                 .build();
     }
 

@@ -1,6 +1,6 @@
 package com.junggotown.global.jwt;
 
-import com.junggotown.dto.member.MemberDto;
+import com.junggotown.domain.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -40,7 +40,7 @@ public class JwtProvider {
      * @param member
      * @return Access Token String
      */
-    public String createAccessToken(MemberDto member) {
+    public String createAccessToken(Member member) {
         return createToken(member, accessTokenExpTime);
     }
 
@@ -50,7 +50,7 @@ public class JwtProvider {
      * @param expireTime
      * @return JWT String
      */
-    private String createToken(MemberDto member, long expireTime) {
+    private String createToken(Member member, long expireTime) {
         String userId = member.getUserId();
         String existingToken = tokenCache.get(userId);
 
@@ -61,6 +61,7 @@ public class JwtProvider {
 
         Claims claims = Jwts.claims();
         claims.put("userId", userId);
+        claims.put("userName", member.getUserName());
 
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expireTime);
@@ -108,6 +109,15 @@ public class JwtProvider {
      */
     public String getUserId(HttpServletRequest request) {
         return parseClaims(resolveToken(request)).get("userId", String.class);
+    }
+
+    /**
+     * Request에서 userName 추출
+     * @param request
+     * @return userName
+     */
+    public String getUserName(HttpServletRequest request) {
+        return parseClaims(resolveToken(request)).get("userName", String.class);
     }
 
 

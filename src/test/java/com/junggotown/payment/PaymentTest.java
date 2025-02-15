@@ -2,7 +2,6 @@ package com.junggotown.payment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.junggotown.TestUtil;
-import com.junggotown.domain.Member;
 import com.junggotown.domain.Product;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.member.MemberDto;
@@ -22,9 +21,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,18 +42,17 @@ public class PaymentTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
     @Autowired private MemberService memberService;
+    @Autowired private RestClient restClient;
 
     private String userId;
     private String token;
 
     private final String CREATE_URL = "/api/v1/payments/virtual-account/create";
 
-    @Value("${toss.search-payment-url}")
+    @Value("${toss.endpoints.search}")
     private String SEARCH_PAYMENT_URL;
-    @Value("${toss.virtual-account-url}")
+    @Value("${toss.endpoints.virtual-account}")
     private String VIRTUAL_ACCOUNT_URL;
-    @Value("${toss.secret}")
-    private String TOSS_SECRET_KEY;
 
     private static final Product product = Product.builder()
                                                 .id(1L)
@@ -64,10 +60,7 @@ public class PaymentTest {
                                                 .price(BigDecimal.valueOf(100000))
                                                 .build();
 
-    private static final Member member = Member.builder()
-                                            .userId("test")
-                                            .userName("김철수")
-                                            .build();
+    private static final String userName = "홍길동";
 
     @BeforeEach
     void 로그인() throws Exception {
@@ -82,14 +75,9 @@ public class PaymentTest {
 
     @Test
     void 가상계좌발급_API요청() {
-        RestClient restClient = RestClient.builder()
-                .baseUrl(VIRTUAL_ACCOUNT_URL)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
         ResponseVirtualAccountDto response = restClient.post()
-                .body(VirtualAccountDto.createVirtualAccountDto(product, member))
+                .uri(VIRTUAL_ACCOUNT_URL)
+                .body(VirtualAccountDto.createVirtualAccountDto(product, userName))
                 .retrieve()
                 .body(ResponseVirtualAccountDto.class);
 
@@ -121,13 +109,8 @@ public class PaymentTest {
 
     @Test
     void 결제내역조회_API요청() {
-        RestClient restClient = RestClient.builder()
-                .baseUrl(SEARCH_PAYMENT_URL + "tviva20250215152329ZgDo6")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
         ResponseVirtualAccountDto response = restClient.get()
+                .uri(SEARCH_PAYMENT_URL+"/{paymentKey}", "")
                 .retrieve()
                 .body(ResponseVirtualAccountDto.class);
 
