@@ -7,8 +7,8 @@ import com.junggotown.domain.Product;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
-import com.junggotown.dto.payment.PaymentDto;
 import com.junggotown.dto.payment.ResponseVirtualAccountDto;
+import com.junggotown.dto.payment.VirtualAccountDto;
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.global.common.ResponseMessage;
 import com.junggotown.service.MemberService;
@@ -51,6 +51,8 @@ public class PaymentTest {
 
     private final String CREATE_URL = "/api/v1/payments/virtual-account/create";
 
+    @Value("${toss.search-payment-url}")
+    private String SEARCH_PAYMENT_URL;
     @Value("${toss.virtual-account-url}")
     private String VIRTUAL_ACCOUNT_URL;
     @Value("${toss.secret}")
@@ -58,13 +60,13 @@ public class PaymentTest {
 
     private static final Product product = Product.builder()
                                                 .id(1L)
-                                                .productName("아이폰15프로")
-                                                .price(BigDecimal.valueOf(1000))
+                                                .productName("맥북 M1")
+                                                .price(BigDecimal.valueOf(100000))
                                                 .build();
 
     private static final Member member = Member.builder()
                                             .userId("test")
-                                            .userName("홍길동")
+                                            .userName("김철수")
                                             .build();
 
     @BeforeEach
@@ -87,13 +89,13 @@ public class PaymentTest {
                 .build();
 
         ResponseVirtualAccountDto response = restClient.post()
-                .body(PaymentDto.createPaymentDto(product, member))
+                .body(VirtualAccountDto.createVirtualAccountDto(product, member))
                 .retrieve()
                 .body(ResponseVirtualAccountDto.class);
 
-        log.info("response: {}", response);
+        log.info("response: {}", response.getTotalAmount());
         log.info("response: {}", response.getOrderId());
-        log.info("response: {}", response.getVirtualAccount());
+        log.info("response: {}", response.getPaymentKey());
         log.info("response: {}", response.getVirtualAccount().getAccountNumber());
         log.info("response: {}", response.getVirtualAccount().getCustomerName());
     }
@@ -113,7 +115,27 @@ public class PaymentTest {
         saveProduct();
 
         JsonNode response = TestUtil.performGetRequestAndGetResponse(mockMvc, CREATE_URL + "?productId=1", userId, token, HttpStatus.UNAUTHORIZED);
+
         assertThat(response.get("code").asInt()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    void 결제내역조회_API요청() {
+        RestClient restClient = RestClient.builder()
+                .baseUrl(SEARCH_PAYMENT_URL + "tviva20250215152329ZgDo6")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + TOSS_SECRET_KEY)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+
+        ResponseVirtualAccountDto response = restClient.get()
+                .retrieve()
+                .body(ResponseVirtualAccountDto.class);
+
+        log.info("status : {}", response.getStatus());
+        log.info("response: {}", response.getOrderId());
+        log.info("response: {}", response.getPaymentKey());
+        log.info("response: {}", response.getVirtualAccount().getAccountNumber());
+        log.info("response: {}", response.getVirtualAccount().getCustomerName());
     }
 
     void saveProduct() throws Exception {
