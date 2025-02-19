@@ -1,6 +1,5 @@
 package com.junggotown.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junggotown.domain.Orders;
 import com.junggotown.domain.Payment;
@@ -35,7 +34,6 @@ public class PaymentService {
     private final OrdersService ordersService;
     private final PaymentRepository paymentRepository;
     private final ProductService productService;
-    private final MemberService memberService;
     private final JwtProvider jwtProvider;
     private final RestClient restClient;
 
@@ -76,16 +74,22 @@ public class PaymentService {
     }
 
     public ApiResponseDto<String> searchPaymentStatus(String paymentKey) {
-        String response = restClient.get()
+        String result = restClient.get()
                 .uri(SEARCH_PAYMENT_URL + "/{paymentKey}", paymentKey)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, (request, response) -> {
+                    throw new CustomException(
+                            response.getStatusCode().value()
+                            , new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)
+                    );
+                })
                 .body(String.class);
 
         try {
-            String status = new ObjectMapper().readTree(response).get("status").asText();
+            String status = new ObjectMapper().readTree(result).get("status").asText();
             return ApiResponseDto.response(ResponseMessage.SEARCH_PAYMENT_SUCCESS, getStatusMessage(status));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new CustomException(ResponseMessage.SEARCH_PAYMENT_FAIL, e);
         }
     }
 
