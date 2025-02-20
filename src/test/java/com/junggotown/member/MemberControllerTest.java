@@ -80,4 +80,36 @@ public class MemberControllerTest {
 
         verify(memberService, times(2)).join(any(MemberDto.class));
     }
+
+    @Test
+    @DisplayName("로그인 성공")
+    void loginSuccess() throws Exception {
+        when(memberService.login(any(MemberDto.class))).thenReturn(ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS));
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .param("userId", memberDto.getUserId())
+                        .param("userPw", memberDto.getUserPw())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(ResponseMessage.LOGIN_SUCCESS.getMessage()));
+
+
+        verify(memberService, times(1)).login(any(MemberDto.class));
+    }
+
+    @Test
+    @DisplayName("로그인 실패")
+    void loginFailNotMatchPassword() throws Exception {
+        when(memberService.login(any(MemberDto.class))).thenReturn(ApiResponseDto.response(ResponseMessage.LOGIN_FAIL));
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .param("userId", memberDto.getUserId())
+                        .param("userPw", memberDto.getUserPw()+"invalid")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(ResponseMessage.LOGIN_FAIL.getMessage()));
+
+
+        verify(memberService, times(1)).login(any(MemberDto.class));
+    }
 }
