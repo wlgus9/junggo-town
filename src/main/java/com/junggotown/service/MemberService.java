@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,24 +38,19 @@ public class MemberService {
     }
 
     public ApiResponseDto<ResponseMemberDto> login(MemberDto memberDto) {
-        boolean passwordMatch = passwordEncoder.matches(
-                    memberDto.getUserPw()
-                    , memberRepository.findByUserId(memberDto.getUserId())
-                            .map(Member::getUserPw)
-                            .orElseThrow(() -> new CustomException(ResponseMessage.LOGIN_FAIL))
-                );
+        Optional<Member> member = memberRepository.findByUserId(memberDto.getUserId());
+
+        boolean passwordMatch = passwordEncoder.matches(memberDto.getUserPw(), member.map(Member::getUserPw)
+                        .orElseThrow(() -> new CustomException(ResponseMessage.LOGIN_FAIL)));
 
         if(passwordMatch) {
             return ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS
-                    , ResponseMemberDto.getLoginDto(jwtUtil.createAccessToken(memberDto)));
+                    , ResponseMemberDto.getLoginDto(jwtUtil.createAccessToken(member
+                            .orElseThrow(() -> new CustomException(ResponseMessage.MEMBER_IS_NOT_EXISTS))
+                    ))
+            );
         } else {
             throw new CustomException(ResponseMessage.LOGIN_FAIL);
         }
-    }
-
-    // 가상계좌 발급에 필요한 회원 정보 조회
-    public Member getMember(String userId) {
-        return memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(ResponseMessage.MEMBER_IS_NOT_EXISTS));
     }
 }
