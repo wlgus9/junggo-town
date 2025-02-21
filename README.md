@@ -59,6 +59,11 @@ src
 ```
 ---
 
+## ERD
+![img.png](src/main/resources/static/img/erd.png)
+
+---
+
 ## 트러블슈팅
 * 컨트롤러 계층 단위테스트 중 @WebMvcTest 사용 시 발생한 문제 
   * https://devstudy-record.tistory.com/86
