@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -38,16 +36,14 @@ public class MemberService {
     }
 
     public ApiResponseDto<ResponseMemberDto> login(MemberDto memberDto) {
-        Optional<Member> member = memberRepository.findByUserId(memberDto.getUserId());
+        Member member = memberRepository.findByUserId(memberDto.getUserId())
+                            .orElseThrow(() -> new CustomException(ResponseMessage.MEMBER_IS_NOT_EXISTS));
 
-        boolean passwordMatch = passwordEncoder.matches(memberDto.getUserPw(), member.map(Member::getUserPw)
-                        .orElseThrow(() -> new CustomException(ResponseMessage.LOGIN_FAIL)));
+        boolean passwordMatch = passwordEncoder.matches(memberDto.getUserPw(), member.getUserPw());
 
         if(passwordMatch) {
             return ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS
-                    , ResponseMemberDto.getLoginDto(jwtUtil.createAccessToken(member
-                            .orElseThrow(() -> new CustomException(ResponseMessage.MEMBER_IS_NOT_EXISTS))
-                    ))
+                    , ResponseMemberDto.getLoginDto(jwtUtil.createAccessToken(member))
             );
         } else {
             throw new CustomException(ResponseMessage.LOGIN_FAIL);
