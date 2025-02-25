@@ -93,7 +93,7 @@ public class PaymentService {
         }
     }
 
-    private static String getStatusMessage(String status) {
+    private String getStatusMessage(String status) {
         if(status.equals(PaymentStatus.DONE.getStatus())) {
             return ResponseMessage.PAYMENT_DONE.getMessage();
         } else if(status.equals(PaymentStatus.CANCELED.getStatus())) {
@@ -104,7 +104,7 @@ public class PaymentService {
     }
 
     // 가상계좌 발급 요청
-    public ResponseVirtualAccountDto requestVirtualAccount(VirtualAccountDto virtualAccountDto) {
+    private ResponseVirtualAccountDto requestVirtualAccount(VirtualAccountDto virtualAccountDto) {
         return restClient.post()
                 .uri(VIRTUAL_ACCOUNT_URL)
                 .body(virtualAccountDto)
