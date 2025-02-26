@@ -143,17 +143,6 @@ public class JwtProvider {
         return false;
     }
 
-    // JWT 토큰 검증 및 파싱
-    public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-
     /**
      * JWT Claims 추출
      * @param accessToken

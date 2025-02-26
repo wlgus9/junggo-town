@@ -146,19 +146,6 @@ public class PaymentTest {
         return response.getPaymentKey();
     }
 
-    void searchPaymentRequestAPI() {
-        ResponseVirtualAccountDto response = restClient.get()
-                .uri(SEARCH_PAYMENT_URL+"/{paymentKey}", "")
-                .retrieve()
-                .body(ResponseVirtualAccountDto.class);
-
-        log.info("status : {}", response.getStatus());
-        log.info("response: {}", response.getOrderId());
-        log.info("response: {}", response.getPaymentKey());
-        log.info("response: {}", response.getVirtualAccount().getAccountNumber());
-        log.info("response: {}", response.getVirtualAccount().getCustomerName());
-    }
-
     void saveProduct() throws Exception {
         ProductDto productDto = ProductDto.getCreateDto("아이폰 15프로", "미개봉 새상품이에요.", BigDecimal.valueOf(100000));
         TestUtil.performPostRequestAndGetResponse(mockMvc, "/api/v1/products/create", userId, token, productDto, HttpStatus.OK);
