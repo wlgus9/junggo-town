@@ -78,7 +78,7 @@ public class PaymentTest {
         );
 
         memberService.join(memberDto);
-        ApiResponseDto<ResponseMemberDto> apiResponseDto = memberService.login(memberDto);
+        ApiResponseDto<ResponseMemberDto> apiResponseDto = memberService.login(memberDto).getBody();
 
         userId = memberDto.getUserId();
         token = apiResponseDto.getData().getToken();

@@ -19,6 +19,10 @@ spring:
   output:
     ansi:
       enabled: always
+  redis:
+    host: localhost
+    port: 6379
+
 
 springdoc:
   swagger-ui:
@@ -42,8 +46,10 @@ springdoc:
   override-with-generic-response: false
 
 jwt:
-  expiration_time: 86400000 #1일
-  secret: zk+5IRIt90hfC7C1KwNVtX9TcjY8HT0/fZvmVrHIY+1ESeWbBfPW7HrNnXf+AtTdWg+LdbP4MBt3ued4ulNcjw==
+  expiration_time:
+    access_token: 900000      # 15분 (15 * 60 * 1000 ms)
+    refresh_token: 604800000  # 7일 (7 * 24 * 60 * 60 * 1000 ms)
+  secret_key: zk+5IRIt90hfC7C1KwNVtX9TcjY8HT0/fZvmVrHIY+1ESeWbBfPW7HrNnXf+AtTdWg+LdbP4MBt3ued4ulNcjw==
 
 toss:
   base-url: https://api.tosspayments.com/v1

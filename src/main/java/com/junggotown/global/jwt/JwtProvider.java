@@ -4,11 +4,11 @@ import com.junggotown.domain.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.security.Key;
 import java.time.ZonedDateTime;
@@ -23,16 +23,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class JwtProvider {
     private final Key key; // JWT secret key
-    private final long accessTokenExpTime; // 토큰 유효기간
+    private final long accessTokenExpTime; // access 토큰 유효기간
+    private final long refreshTokenExpTime; // refresh 토큰 유효기간
     private final Map<String, String> tokenCache = new ConcurrentHashMap<>(); // 토큰 캐시
 
     public JwtProvider(
-            @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.expiration_time}") long accessTokenExpTime
+            @Value("${jwt.secret_key}") String secretKey,
+            @Value("${jwt.expiration_time.access_token}") long accessTokenExpTime,
+            @Value("${jwt.expiration_time.refresh_token}") long refreshTokenExpTime
     ) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenExpTime = accessTokenExpTime;
+        this.refreshTokenExpTime = refreshTokenExpTime;
     }
 
     /**
@@ -42,6 +45,15 @@ public class JwtProvider {
      */
     public String createAccessToken(Member member) {
         return createToken(member, accessTokenExpTime);
+    }
+
+    /**
+     * Refresh Token 생성
+     * @param member
+     * @return Access Token String
+     */
+    public String createRefreshToken(Member member) {
+        return createToken(member, refreshTokenExpTime);
     }
 
     /**
@@ -84,12 +96,20 @@ public class JwtProvider {
      * @return token
      */
     public String resolveToken(HttpServletRequest request) {
-        ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
-        String token = wrappedRequest.getHeader("Authorization");
+        String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+            return token.substring(7); // "Bearer " 제거
         }
-        return token;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refresh_token".equals(cookie.getName())) { // 쿠키 이름이 "refresh_token"인 경우
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -145,12 +165,12 @@ public class JwtProvider {
 
     /**
      * JWT Claims 추출
-     * @param accessToken
+     * @param token
      * @return JWT Claims
      */
-    public Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String token) {
         try {
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }

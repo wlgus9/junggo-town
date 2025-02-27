@@ -59,7 +59,7 @@ public class MemberTest {
             MemberDto memberDto = MemberDto.getMemberDto("테스트ID", passwordEncoder.encode("테스트PW"), "테스트", "010-1234-5678");
             memberService.join(memberDto);
 
-            ApiResponseDto<ResponseMemberDto> apiResponseDto = memberService.login(memberDto);
+            ApiResponseDto<ResponseMemberDto> apiResponseDto = memberService.login(memberDto).getBody();
 
             assertThat(apiResponseDto.getHttpStatus().value()).isEqualTo(200);
         }
