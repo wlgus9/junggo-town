@@ -8,9 +8,12 @@ import com.junggotown.dto.member.MemberDto;
 import com.junggotown.dto.member.ResponseMemberDto;
 import com.junggotown.dto.payment.ResponseVirtualAccountDto;
 import com.junggotown.dto.payment.VirtualAccountDto;
+import com.junggotown.dto.payment.WebHookDto;
 import com.junggotown.dto.product.ProductDto;
 import com.junggotown.global.common.ResponseMessage;
+import com.junggotown.global.exception.CustomException;
 import com.junggotown.service.MemberService;
+import com.junggotown.service.PaymentService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +35,7 @@ import org.springframework.web.client.RestClient;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.ANY)
@@ -45,6 +49,7 @@ public class PaymentTest {
     @Autowired private BCryptPasswordEncoder passwordEncoder;
     @Autowired private MemberService memberService;
     @Autowired private RestClient restClient;
+    @Autowired private PaymentService paymentService;
 
     private String userId;
     private String token;
@@ -73,7 +78,7 @@ public class PaymentTest {
         );
 
         memberService.join(memberDto);
-        ApiResponseDto<ResponseMemberDto> apiResponseDto = memberService.login(memberDto);
+        ApiResponseDto<ResponseMemberDto> apiResponseDto = memberService.login(memberDto).getBody();
 
         userId = memberDto.getUserId();
         token = apiResponseDto.getData().getToken();
@@ -136,6 +141,19 @@ public class PaymentTest {
         }
     }
 
+    @Test
+    @DisplayName("결제상태 업데이트")
+    void updatePaymentStatus() {
+        WebHookDto webHookDto = WebHookDto.builder()
+                                        .status("DONE")
+                                        .secret("testSecret")
+                                        .orderId("testOrderId")
+                                        .build();
+
+        assertThatThrownBy(() -> paymentService.updatePaymentStatus(webHookDto))
+                .isInstanceOf(CustomException.class);
+    }
+
     String virtualAccountRequestAPI() {
         ResponseVirtualAccountDto response = restClient.post()
                 .uri(VIRTUAL_ACCOUNT_URL)
@@ -144,19 +162,6 @@ public class PaymentTest {
                 .body(ResponseVirtualAccountDto.class);
 
         return response.getPaymentKey();
-    }
-
-    void searchPaymentRequestAPI() {
-        ResponseVirtualAccountDto response = restClient.get()
-                .uri(SEARCH_PAYMENT_URL+"/{paymentKey}", "")
-                .retrieve()
-                .body(ResponseVirtualAccountDto.class);
-
-        log.info("status : {}", response.getStatus());
-        log.info("response: {}", response.getOrderId());
-        log.info("response: {}", response.getPaymentKey());
-        log.info("response: {}", response.getVirtualAccount().getAccountNumber());
-        log.info("response: {}", response.getVirtualAccount().getCustomerName());
     }
 
     void saveProduct() throws Exception {

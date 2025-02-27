@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ResponseMessage {
     LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다.")
+    , LOGOUT_SUCCESS(HttpStatus.OK, "로그아웃에 성공했습니다.")
     , MEMBER_JOIN_SUCCESS(HttpStatus.OK, "회원가입이 완료되었습니다.")
     , PRODUCT_CREATE_SUCCESS(HttpStatus.OK, "상품 등록이 완료되었습니다.")
     , PRODUCT_SEARCH_SUCCESS(HttpStatus.OK, "등록한 상품이 조회되었습니다.")
@@ -24,6 +25,7 @@ public enum ResponseMessage {
     , SEARCH_PAYMENT_SUCCESS(HttpStatus.OK, "결제내역 조회가 완료되었습니다.")
 
     , LOGIN_FAIL(HttpStatus.BAD_REQUEST, "로그인에 실패했습니다.")
+    , LOGOUT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "로그아웃에 실패했습니다.")
     , MEMBER_JOIN_DUPLICATE(HttpStatus.BAD_REQUEST, "아이디가 중복되었습니다.")
     , MEMBER_JOIN_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다.")
     , MEMBER_IS_NOT_EXISTS(HttpStatus.BAD_REQUEST, "회원정보가 존재하지 않습니다.")

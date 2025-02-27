@@ -64,15 +64,15 @@ public class ChatTest {
         memberService.join(memberDto2);
         memberService.join(memberDto3);
 
-        ApiResponseDto<ResponseMemberDto> apiResponseDto1 = memberService.login(memberDto1);
+        ApiResponseDto<ResponseMemberDto> apiResponseDto1 = memberService.login(memberDto1).getBody();
         registUserId1 = memberDto1.getUserId();
         registUserToken1 = apiResponseDto1.getData().getToken();
 
-        ApiResponseDto<ResponseMemberDto> apiResponseDto2 = memberService.login(memberDto2);
+        ApiResponseDto<ResponseMemberDto> apiResponseDto2 = memberService.login(memberDto2).getBody();
         registUserId2 = memberDto2.getUserId();
         registUserToken2 = apiResponseDto2.getData().getToken();
 
-        ApiResponseDto<ResponseMemberDto> apiResponseDto3 = memberService.login(memberDto3);
+        ApiResponseDto<ResponseMemberDto> apiResponseDto3 = memberService.login(memberDto3).getBody();
         consumerUserId = memberDto3.getUserId();
         consumerUserToken = apiResponseDto3.getData().getToken();
     }

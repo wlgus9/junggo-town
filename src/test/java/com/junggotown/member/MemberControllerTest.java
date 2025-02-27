@@ -5,6 +5,7 @@ import com.junggotown.controller.MemberController;
 import com.junggotown.dto.ApiResponseDto;
 import com.junggotown.dto.member.MemberDto;
 import com.junggotown.global.common.ResponseMessage;
+import com.junggotown.global.exception.CustomException;
 import com.junggotown.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -84,7 +86,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("로그인 성공")
     void loginSuccess() throws Exception {
-        when(memberService.login(any(MemberDto.class))).thenReturn(ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS));
+        when(memberService.login(any(MemberDto.class))).thenReturn(ResponseEntity.ok(ApiResponseDto.response(ResponseMessage.LOGIN_SUCCESS)));
 
         mockMvc.perform(post("/api/v1/members/login")
                         .param("userId", memberDto.getUserId())
@@ -100,7 +102,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("로그인 실패")
     void loginFailNotMatchPassword() throws Exception {
-        when(memberService.login(any(MemberDto.class))).thenReturn(ApiResponseDto.response(ResponseMessage.LOGIN_FAIL));
+        when(memberService.login(any(MemberDto.class))).thenThrow(CustomException.class);
 
         mockMvc.perform(post("/api/v1/members/login")
                         .param("userId", memberDto.getUserId())
